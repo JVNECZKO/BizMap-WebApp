@@ -31,7 +31,7 @@ class NormalizeBusinessPkdCommand extends Command
         $this->info('Normalizacja kodów PKD (firmy + pivot) ...');
         $pkdVersion = Setting::get('pkd.version', '2007');
 
-        $chunkSize = 80; // małe porcje dla SQLite (limit parametrów)
+        $chunkSize = 50; // małe porcje dla SQLite (limit parametrów)
 
         Business::query()
             ->orderBy('id')
@@ -65,7 +65,9 @@ class NormalizeBusinessPkdCommand extends Command
                     foreach (array_chunk($ids, $chunkSize) as $idChunk) {
                         BusinessPkdCode::whereIn('business_id', $idChunk)->delete();
                     }
-                    BusinessPkdCode::insert($pivotPayload);
+                    foreach (array_chunk($pivotPayload, 200) as $pivotChunk) {
+                        BusinessPkdCode::insert($pivotChunk);
+                    }
                 }
             });
 
