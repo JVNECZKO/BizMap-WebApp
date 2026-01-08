@@ -4,6 +4,8 @@
     #################################################################
     # 1) TWARDY BLOCK – WRAŻLIWE KATALOGI (403)
     #################################################################
+    # Zezwól na publiczny symlink /storage (asset), blokuj resztę katalogu storage
+    RewriteCond %{REQUEST_URI} !^/storage/ [NC]
     RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor)(/|$) - [F,L]
 
     #################################################################
