@@ -22,6 +22,7 @@
     # 4) FRONT CONTROLLER – CAŁY RUCH DO /public
     #################################################################
     RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_URI} !^/storage/
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ public%{REQUEST_URI} [L]
