@@ -37,6 +37,7 @@ class PkdController extends Controller
             @set_time_limit(0);
             Artisan::call($command, $params);
             $output = Artisan::output();
+            $this->clearCaches();
             return response()->json([
                 'ok' => true,
                 'output' => $output,
@@ -48,5 +49,13 @@ class PkdController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    protected function clearCaches(): void
+    {
+        cache()->forget('pkd_popularity_snapshot_exists');
+        cache()->forget('bizmap_popular_pkd_' . md5(json_encode(['limit' => 8])));
+        // w razie czego czyścimy również standardowy cache aplikacji (lekki)
+        cache()->flush();
     }
 }
