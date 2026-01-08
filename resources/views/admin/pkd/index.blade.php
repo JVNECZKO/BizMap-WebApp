@@ -34,6 +34,12 @@
 
 @push('scripts')
 <script>
+function appendLog(line) {
+    const log = document.getElementById('pkd-log');
+    log.textContent += line + "\n";
+    log.scrollTop = log.scrollHeight;
+}
+
 async function runPkd(action) {
     const buttons = {
         import: document.getElementById('btn-import'),
@@ -44,10 +50,13 @@ async function runPkd(action) {
     const btn = buttons[action];
     if (!btn) return;
     btn.disabled = true;
+    const original = btn.textContent;
     btn.textContent = 'Wykonywanie...';
 
-    log.textContent = `Uruchamiam: ${action}...\n`;
+    log.textContent = '';
+    appendLog(`Uruchamiam: ${action}...`);
     try {
+        appendLog('Wysyłam żądanie do serwera...');
         const res = await fetch(`{{ route('admin.pkd.index') }}/${action}`, {
             method: 'POST',
             headers: {
@@ -55,17 +64,19 @@ async function runPkd(action) {
                 'Accept': 'application/json'
             }
         });
+        appendLog(`Status HTTP: ${res.status}`);
         const data = await res.json();
         if (data.ok) {
-            log.textContent += data.output || 'Zakończono.\n';
+            appendLog('Odpowiedź OK, log polecenia:');
+            appendLog(data.output || 'Zakończono.');
         } else {
-            log.textContent += `Błąd: ${data.error || 'nieznany'}\n`;
+            appendLog(`Błąd: ${data.error || 'nieznany'}`);
         }
     } catch (e) {
-        log.textContent += `Błąd sieci/serwera: ${e}\n`;
+        appendLog(`Błąd sieci/serwera: ${e}`);
     } finally {
         btn.disabled = false;
-        btn.textContent = btn.textContent.replace('Wykonywanie...', '').trim() || 'OK';
+        btn.textContent = original;
     }
 }
 </script>

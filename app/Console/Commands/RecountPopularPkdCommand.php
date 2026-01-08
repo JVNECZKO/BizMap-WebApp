@@ -37,7 +37,9 @@ class RecountPopularPkdCommand extends Command
         })->all();
 
         if (! empty($payload)) {
-            DB::table('pkd_popularity')->insert($payload);
+            foreach (array_chunk($payload, 50) as $chunk) {
+                DB::table('pkd_popularity')->insert($chunk);
+            }
         }
 
         $this->info('Gotowe: ' . count($payload) . ' kodów.');
