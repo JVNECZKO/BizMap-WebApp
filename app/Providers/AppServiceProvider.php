@@ -27,6 +27,21 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         Paginator::useTailwind();
 
+        // Hard-override default driver from ENV on each boot (to avoid stale config cache)
+        $envDriver = env('DB_CONNECTION', config('database.default'));
+        config(['database.default' => $envDriver]);
+
+        if ($envDriver === 'sqlite') {
+            $envPath = env('DB_DATABASE', database_path('database.sqlite'));
+            if (! str_starts_with($envPath, '/')) {
+                $envPath = base_path($envPath);
+            }
+            if (! file_exists($envPath)) {
+                @touch($envPath);
+            }
+            config(['database.connections.sqlite.database' => $envPath]);
+        }
+
         if (Schema::hasTable('settings')) {
             $adminPrefix = Setting::get('admin.prefix', config('bizmap.admin_prefix'));
             config(['bizmap.admin_prefix' => $adminPrefix]);
