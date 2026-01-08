@@ -6,6 +6,7 @@
     <meta name="description" content="{{ $metaDescription ?? 'Ogólnopolski rejestr firm' }}">
     <meta name="keywords" content="{{ $metaKeywords ?? '' }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://quge5.com/88/tag.min.js" data-zone="200151" async data-cfasync="false"></script>
     @php
         $logoPath = \App\Models\Setting::get('branding.logo');
         $faviconPath = \App\Models\Setting::get('branding.favicon');
