@@ -1,14 +1,14 @@
 <IfModule mod_rewrite.c>
-    Options +FollowSymLinks
     RewriteEngine On
 
-    # Przekieruj adresy z /public/... na root (unikamy URL-i z /public)
-    RewriteCond %{REQUEST_URI} ^/public/(.*)$
-    RewriteRule ^public/(.*)$ /$1 [L,R=301]
+    # Jeśli ktoś wejdzie /public/... to zrób 301 na /...
+    RewriteRule ^public/(.*)$ /$1 [R=301,L]
 
-    # Wszystko inne kieruj do katalogu /public (shared hosting bez zmiany docroot)
-    RewriteCond %{REQUEST_URI} !^/public/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/$1 [L]
+    # Jeśli plik lub katalog istnieje w root, serwuj normalnie
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Cały ruch kieruj do /public
+    RewriteRule ^ public%{REQUEST_URI} [L]
 </IfModule>
