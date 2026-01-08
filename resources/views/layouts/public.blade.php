@@ -39,7 +39,9 @@
             }
         }
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6310815970812781" crossorigin="anonymous"></script>
+    @php
+        $adProviders = \App\Models\Setting::get('ads.providers', []);
+    @endphp
     <style>
         body {
             background: radial-gradient(circle at 10% 20%, #e0f2fe 0, transparent 25%), radial-gradient(circle at 90% 10%, #e2e8f0 0, transparent 20%), #ffffff;
@@ -52,13 +54,13 @@
     </style>
 </head>
 <body class="font-sans text-slate-900 antialiased">
-    <script>
-        // Page-level AdSense (apply to all public pages)
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-6310815970812781",
-            enable_page_level_ads: true
-        });
-    </script>
+    @if(is_array($adProviders))
+        @foreach($adProviders as $provider)
+            @if(($provider['enabled'] ?? false) && !empty($provider['code']))
+                {!! $provider['code'] !!}
+            @endif
+        @endforeach
+    @endif
     <div class="relative">
         <nav class="sticky top-0 z-40 glass shadow-card">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
