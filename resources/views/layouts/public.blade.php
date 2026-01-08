@@ -39,9 +39,6 @@
             }
         }
     </script>
-    @php
-        $adProviders = \App\Models\Setting::get('ads.providers', []);
-    @endphp
     <style>
         body {
             background: radial-gradient(circle at 10% 20%, #e0f2fe 0, transparent 25%), radial-gradient(circle at 90% 10%, #e2e8f0 0, transparent 20%), #ffffff;
@@ -71,12 +68,25 @@
                         <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 shadow-card"></div>
                     @endif
                 </a>
-                <div class="flex items-center gap-6 text-sm font-medium">
+                <button class="lg:hidden px-3 py-2 rounded-xl border border-slate-200 text-slate-700" id="nav-toggle">
+                    <span class="sr-only">Menu</span>
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="hidden lg:flex items-center gap-6 text-sm font-medium" id="nav-links">
                     <a href="{{ route('landing') }}" class="text-slate-600 hover:text-slate-900 transition">Strona główna</a>
                     <a href="{{ route('companies.index') }}" class="text-slate-600 hover:text-slate-900 transition">Firmy</a>
                     <a href="{{ route('pkd.index') }}" class="text-slate-600 hover:text-slate-900 transition">PKD</a>
                     <a href="{{ route('about') }}" class="text-slate-600 hover:text-slate-900 transition">O nas</a>
                     <a href="{{ route('contact') }}" class="text-slate-600 hover:text-slate-900 transition">Kontakt</a>
+                </div>
+            </div>
+            <div class="lg:hidden px-6 pb-3" id="nav-drawer" style="display:none;">
+                <div class="flex flex-col gap-2 text-sm font-medium bg-white/90 rounded-xl border border-slate-200 shadow-card p-4">
+                    <a href="{{ route('landing') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Strona główna</a>
+                    <a href="{{ route('companies.index') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Firmy</a>
+                    <a href="{{ route('pkd.index') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">PKD</a>
+                    <a href="{{ route('about') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">O nas</a>
+                    <a href="{{ route('contact') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Kontakt</a>
                 </div>
             </div>
         </nav>
@@ -147,6 +157,35 @@
     <div id="ab-bait2" class="ad ads ad-banner adsbox adunit"
          style="position:absolute;left:-9999px;top:-9999px;height:10px;width:10px;"></div>
     <script src="/ads.js" async></script>
+
+    <script>
+      (() => {
+        const toggle = document.getElementById('nav-toggle');
+        const drawer = document.getElementById('nav-drawer');
+        const links = drawer?.querySelectorAll('.nav-link') ?? [];
+        const mq = window.matchMedia('(min-width: 1024px)');
+
+        function closeDrawer() {
+          if (drawer) drawer.style.display = 'none';
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        }
+
+        function openDrawer() {
+          if (drawer) drawer.style.display = 'block';
+          if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        }
+
+        function toggleDrawer() {
+          if (!drawer) return;
+          const isOpen = drawer.style.display === 'block';
+          isOpen ? closeDrawer() : openDrawer();
+        }
+
+        toggle?.addEventListener('click', toggleDrawer);
+        links.forEach(link => link.addEventListener('click', closeDrawer));
+        mq.addEventListener('change', (e) => { if (e.matches) closeDrawer(); });
+      })();
+    </script>
 
     @stack('scripts')
     <script>
