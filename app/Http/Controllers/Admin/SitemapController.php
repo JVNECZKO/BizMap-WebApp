@@ -25,7 +25,10 @@ class SitemapController extends Controller
 
     public function run(SitemapService $sitemapService)
     {
-        $result = $sitemapService->runChunk();
+        $steps = (int) request()->input('steps', 10);
+        $steps = max(1, min($steps, 50)); // safety
+
+        $result = $sitemapService->runChunk($steps);
 
         return response()->json($result);
     }

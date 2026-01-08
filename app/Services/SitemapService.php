@@ -50,47 +50,54 @@ class SitemapService
         Cache::forever($this->jobKey, $state);
     }
 
-    public function runChunk(): array
+    public function runChunk(int $steps = 1): array
     {
         $state = Cache::get($this->jobKey);
         if (! $state) {
             return ['status' => 'idle'];
         }
 
-        $chunk = Business::query()
-            ->select(['id', 'slug', 'updated_at'])
-            ->where('id', '>', $state['last_id'])
-            ->orderBy('id')
-            ->limit($this->urlsPerFile)
-            ->get();
+        $stepsDone = 0;
+        $lastFile = null;
 
-        if ($chunk->isEmpty()) {
-            $indexXml = $this->renderIndex($state['files']);
-            File::put(public_path('sitemap.xml'), $indexXml);
-            Setting::setValue('sitemap.last_generated_at', now()->toDateTimeString());
-            Cache::forget($this->jobKey);
+        while ($stepsDone < $steps) {
+            $chunk = Business::query()
+                ->select(['id', 'slug', 'updated_at'])
+                ->where('id', '>', $state['last_id'])
+                ->orderBy('id')
+                ->limit($this->urlsPerFile)
+                ->get();
 
-            return [
-                'status' => 'finished',
-                'files' => $state['files'],
-                'total_processed' => $state['processed'],
-            ];
+            if ($chunk->isEmpty()) {
+                $indexXml = $this->renderIndex($state['files']);
+                File::put(public_path('sitemap.xml'), $indexXml);
+                Setting::setValue('sitemap.last_generated_at', now()->toDateTimeString());
+                Cache::forget($this->jobKey);
+
+                return [
+                    'status' => 'finished',
+                    'files' => $state['files'],
+                    'total_processed' => $state['processed'],
+                ];
+            }
+
+            $fileName = "sitemap-companies-{$state['file_index']}.xml";
+            $xml = $this->renderUrlSet($chunk);
+            File::put(public_path($fileName), $xml);
+            $lastFile = $fileName;
+
+            $state['files'][] = $fileName;
+            $state['last_id'] = $chunk->last()->id;
+            $state['file_index']++;
+            $state['processed'] += $chunk->count();
+            $stepsDone++;
         }
-
-        $fileName = "sitemap-companies-{$state['file_index']}.xml";
-        $xml = $this->renderUrlSet($chunk);
-        File::put(public_path($fileName), $xml);
-
-        $state['files'][] = $fileName;
-        $state['last_id'] = $chunk->last()->id;
-        $state['file_index']++;
-        $state['processed'] += $chunk->count();
 
         Cache::forever($this->jobKey, $state);
 
         return [
             'status' => 'running',
-            'file' => $fileName,
+            'file' => $lastFile,
             'last_id' => $state['last_id'],
             'files_count' => count($state['files']),
             'processed' => $state['processed'],

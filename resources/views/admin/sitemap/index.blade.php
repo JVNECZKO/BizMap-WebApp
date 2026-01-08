@@ -34,6 +34,7 @@
     const statusEl = document.getElementById('sitemap-status');
     const btn = document.getElementById('start-sitemap');
     let running = false;
+    let stepsPerCall = 10;
 
     btn.addEventListener('click', async () => {
         if (running) return;
@@ -55,7 +56,20 @@
     });
 
     async function runChunk() {
-        const res = await fetch('{{ route('admin.sitemap.run') }}', {method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}});
+        const res = await fetch('{{ route('admin.sitemap.run') }}', {
+            method:'POST',
+            headers:{
+                'X-CSRF-TOKEN':'{{ csrf_token() }}',
+                'Content-Type':'application/json',
+                'Accept':'application/json'
+            },
+            body: JSON.stringify({steps: stepsPerCall})
+        });
+        if (res.status === 403) {
+            statusEl.innerText = 'Sesja wygasła lub brak dostępu (403). Odśwież stronę i zaloguj się ponownie.';
+            running = false;
+            return;
+        }
         if (!res.ok) {
             statusEl.innerText = 'Błąd podczas generowania.';
             running = false;
@@ -64,7 +78,7 @@
         const data = await res.json();
         if (data.status === 'running') {
             statusEl.innerText = `Przetwarzanie... plik: ${data.file} (łącznie ${data.files_count}), zapisanych rekordów: ${data.processed}`;
-            setTimeout(runChunk, 200);
+            setTimeout(runChunk, 400);
         } else if (data.status === 'finished') {
             statusEl.innerText = `Zakończono generowanie sitemap. Przetworzono ${data.total_processed} rekordów.`;
             running = false;
