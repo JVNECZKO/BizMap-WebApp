@@ -41,6 +41,12 @@ class AppServiceProvider extends ServiceProvider
                     $dbPath = base_path($dbPath);
                 }
 
+                // jeśli ścieżka z ustawień jest nieprawidłowa (np. z innego środowiska), użyj lokalnej domyślnej
+                $defaultPath = database_path('database.sqlite');
+                if (! file_exists($dbPath) && file_exists(dirname($defaultPath))) {
+                    $dbPath = $defaultPath;
+                }
+
                 if (! file_exists($dbPath)) {
                     @touch($dbPath);
                 }
