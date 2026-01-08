@@ -10,10 +10,13 @@ class AdsController extends Controller
 {
     public function index()
     {
-        $providers = Setting::get('ads.providers');
-        if (! is_array($providers) || empty($providers)) {
+        $providers = Setting::get('ads.providers', null);
+        // tylko gdy brak jakiejkolwiek konfiguracji (pierwsze uruchomienie) ładujemy domyślną listę
+        if ($providers === null) {
             $providers = $this->defaultProviders();
             Setting::setValue('ads.providers', $providers, 'json');
+        } elseif (! is_array($providers)) {
+            $providers = [];
         }
 
         return view('admin.ads.index', compact('providers'));
