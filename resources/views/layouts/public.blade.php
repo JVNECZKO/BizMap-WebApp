@@ -51,6 +51,13 @@
     </style>
 </head>
 <body class="font-sans text-slate-900 antialiased">
+    <script>
+        // Page-level AdSense (apply to all public pages)
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-6310815970812781",
+            enable_page_level_ads: true
+        });
+    </script>
     <div class="relative">
         <nav class="sticky top-0 z-40 glass shadow-card">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
