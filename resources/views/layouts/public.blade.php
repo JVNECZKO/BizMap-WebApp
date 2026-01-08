@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ $metaDescription ?? 'Ogólnopolski rejestr firm' }}">
     <meta name="keywords" content="{{ $metaKeywords ?? '' }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
         $logoPath = \App\Models\Setting::get('branding.logo');
         $faviconPath = \App\Models\Setting::get('branding.favicon');
@@ -13,6 +14,7 @@
     @if($faviconPath)
         <link rel="icon" href="{{ asset('storage/' . $faviconPath) }}">
     @endif
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,6 +38,7 @@
             }
         }
     </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6310815970812781" crossorigin="anonymous"></script>
     <style>
         body {
             background: radial-gradient(circle at 10% 20%, #e0f2fe 0, transparent 25%), radial-gradient(circle at 90% 10%, #e2e8f0 0, transparent 20%), #ffffff;
@@ -108,6 +111,97 @@
             </div>
         </footer>
     </div>
+    <div id="ab-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,12,18,.92);z-index:999999;color:#fff">
+      <div style="max-width:620px;margin:12vh auto;padding:24px;background:#141a28;border:1px solid #2a3550;border-radius:16px;line-height:1.45;">
+        <div style="font-size:20px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-ban" style="color:#ef4444;"></i>
+          <span>Dostęp wstrzymany</span>
+        </div>
+        <div style="opacity:.9;">
+          <p style="margin:0 0 10px 0;">
+            Wykryliśmy aktywne oprogramowanie blokujące reklamy, które uniemożliwia prawidłowe działanie tego serwisu.
+            Nasz serwis jest bezpłatny dla użytkowników i jego rozwój finansowany jest z reklam – dbamy, by były one
+            nienachalne, bez dźwięku, wyskakujących okien i agresywnego śledzenia.
+          </p>
+          <p style="margin:0 0 10px 0;">
+            Aby kontynuować, wyłącz blokera reklam dla tej strony i odśwież stronę. Dostęp zostanie automatycznie przywrócony.
+          </p>
+          <p style="margin:0;">
+            <strong>Podpowiedź:</strong> w AdBlock/AdBlock Plus wybierz „Nie uruchamiaj na stronach w tej domenie”,
+            w uBlock Origin kliknij ikonę zasilania (⏻) dla tej strony, a następnie odśwież.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="ab-bait2" class="ad ads ad-banner adsbox adunit"
+         style="position:absolute;left:-9999px;top:-9999px;height:10px;width:10px;"></div>
+    <script src="/ads.js" async></script>
+
     @stack('scripts')
+    <script>
+    (() => {
+      const overlay = document.getElementById('ab-overlay');
+      const bait = document.getElementById('ab-bait2');
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+
+      function baitVisible(){
+        if (!bait) return false;
+        const st = getComputedStyle(bait);
+        const hidden = st.display === 'none' || st.visibility === 'hidden';
+        const zero = bait.offsetHeight === 0 || bait.offsetWidth === 0;
+        return !(hidden || zero);
+      }
+
+      async function ping(url, timeout = 1800){
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeout);
+        try {
+          await fetch(url, {method:'GET', cache:'no-store', credentials:'same-origin', signal: ctrl.signal, mode:'no-cors'});
+          clearTimeout(timer);
+          return true;
+        } catch(e) {
+          clearTimeout(timer);
+          return false;
+        }
+      }
+
+      async function isBlocked(){
+        const baitOk = baitVisible();
+        const scriptLoaded = window.__ads_script_loaded === true || [...document.scripts].some(s => (s.src||'').includes('/ads.js'));
+        const localPing = await ping('/ads.js?cb=' + Date.now());
+        const googlePing = await ping('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?cb=' + Date.now());
+        return !(baitOk && scriptLoaded && localPing && googlePing);
+      }
+
+      async function fail(){
+        try {
+          await fetch('/ab/fail', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-CSRF-TOKEN': csrf || ''},
+            credentials: 'same-origin',
+            body: '{}'
+          });
+        } catch(e) {}
+        overlay.style.display = 'block';
+        document.documentElement.style.overflow = 'hidden';
+      }
+
+      let tripped = false;
+
+      async function check(){
+        if (tripped) return;
+        if (await isBlocked()){
+          tripped = true;
+          await fail();
+        }
+      }
+
+      setInterval(check, 2500);
+      window.addEventListener('focus', check);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+      check();
+    })();
+    </script>
 </body>
 </html>

@@ -17,3 +17,10 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+# databases / dumps
+/database/*.sqlite
+/database/*.db
+/database/*.sql
+
+# generated sitemaps
+/public/sitemap*.xml

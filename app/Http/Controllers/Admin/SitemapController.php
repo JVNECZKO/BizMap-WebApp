@@ -8,17 +8,25 @@ use App\Services\SitemapService;
 
 class SitemapController extends Controller
 {
-    public function index()
+    public function index(SitemapService $sitemapService)
     {
         return view('admin.sitemap.index', [
             'lastGenerated' => Setting::get('sitemap.last_generated_at'),
+            'files' => $sitemapService->listFiles(),
         ]);
     }
 
-    public function generate(SitemapService $sitemapService)
+    public function start(SitemapService $sitemapService)
     {
-        $files = $sitemapService->generate();
+        $sitemapService->start();
 
-        return back()->with('status', 'Wygenerowano sitemapę (' . count($files) . ' plików).');
+        return response()->json(['status' => 'started']);
+    }
+
+    public function run(SitemapService $sitemapService)
+    {
+        $result = $sitemapService->runChunk();
+
+        return response()->json($result);
     }
 }

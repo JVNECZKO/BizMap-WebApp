@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\SitemapController as AdminSitemapController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\SearchController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -18,6 +20,15 @@ Route::get('/firmy', [SearchController::class, 'index'])->name('companies.index'
 Route::get('/firmy/export', [SearchController::class, 'export'])->name('companies.export');
 Route::get('/locations', [SearchController::class, 'locations'])->name('locations');
 Route::get('/pkd-codes', [SearchController::class, 'pkdCodes'])->name('pkd.codes');
+Route::post('/ab/pass', function (Request $r) {
+    $minutes = 10; // short TTL
+    return response()->json(['ok' => true])
+        ->cookie(cookie('ab_ok', '1', $minutes, null, null, true, true, false, 'Lax'));
+})->name('ab.pass');
+Route::post('/ab/fail', function () {
+    return response()->json(['ok' => true])
+        ->cookie(Cookie::forget('ab_ok'));
+})->name('ab.fail');
 Route::get('/firma/{id}-{slug}', [CompanyController::class, 'show'])->name('company.show');
 Route::get('/pkd', [\App\Http\Controllers\PageController::class, 'pkd'])->name('pkd.index');
 Route::get('/o-nas', [\App\Http\Controllers\PageController::class, 'about'])->name('about');
@@ -65,7 +76,8 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::post('/two-factor', [\App\Http\Controllers\Admin\TwoFactorController::class, 'verify'])->name('2fa.verify');
 
     Route::get('/sitemap', [AdminSitemapController::class, 'index'])->name('sitemap.index');
-    Route::post('/sitemap/generate', [AdminSitemapController::class, 'generate'])->name('sitemap.generate');
+    Route::post('/sitemap/start', [AdminSitemapController::class, 'start'])->name('sitemap.start');
+    Route::post('/sitemap/run', [AdminSitemapController::class, 'run'])->name('sitemap.run');
 
     Route::get('/debug', [\App\Http\Controllers\Admin\DebugController::class, 'index'])->name('debug.index');
     Route::post('/debug', [\App\Http\Controllers\Admin\DebugController::class, 'update'])->name('debug.update');
