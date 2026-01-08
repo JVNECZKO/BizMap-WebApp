@@ -20,6 +20,7 @@ yarn-error.log
 /database/*.sqlite
 /database/*.db
 /database/*.sql
+/storage/app/pkd/*.json
 
 # generated sitemaps
 /public/sitemap*.xml
