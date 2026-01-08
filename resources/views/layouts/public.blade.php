@@ -6,38 +6,14 @@
     <meta name="description" content="{{ $metaDescription ?? 'Ogólnopolski rejestr firm' }}">
     <meta name="keywords" content="{{ $metaKeywords ?? '' }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script src="https://quge5.com/88/tag.min.js" data-zone="200151" async data-cfasync="false"></script>
     @php
         $logoPath = \App\Models\Setting::get('branding.logo');
         $faviconPath = \App\Models\Setting::get('branding.favicon');
-        $monetagEnabled = false;
-        if (is_array($adProviders)) {
-            foreach ($adProviders as $p) {
-                if (!empty($p['enabled']) && isset($p['code']) && str_contains($p['code'], 'quge5.com')) {
-                    $monetagEnabled = true;
-                    break;
-                }
-            }
-        }
+        $adProviders = \App\Models\Setting::get('ads.providers', []);
     @endphp
     <title>{{ $metaTitle ?? config('app.name') }}</title>
     @if($faviconPath)
         <link rel="icon" href="{{ asset('storage/' . $faviconPath) }}">
-    @endif
-    @if(!$monetagEnabled)
-    <script>
-        // Jeśli Monetag/Propeller wyłączony, spróbuj odpiąć ewentualne service workery w przeglądarce
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs){
-                regs.forEach(function(reg){
-                    const url = reg.active?.scriptURL || reg.scriptURL || '';
-                    if (url.includes('sw.js') || url.includes('quge5.com') || url.includes('propeller') || url.includes('monetag')) {
-                        reg.unregister();
-                    }
-                });
-            }).catch(function(){});
-        }
-    </script>
     @endif
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">

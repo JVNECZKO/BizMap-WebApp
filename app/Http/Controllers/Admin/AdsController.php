@@ -56,11 +56,6 @@ class AdsController extends Controller
                 'code' => '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6310815970812781" crossorigin="anonymous"></script>
 <script>(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-6310815970812781", enable_page_level_ads:true});</script>',
             ],
-            [
-                'name' => 'Monetag / Propeller',
-                'enabled' => true,
-                'code' => '<script src="https://quge5.com/88/tag.min.js" data-zone="200151" async data-cfasync="false"></script>',
-            ],
         ];
     }
 }
