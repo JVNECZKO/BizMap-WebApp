@@ -68,7 +68,8 @@ class ImportPkdCommand extends Command
             }
 
             $total = 0;
-            foreach (array_chunk($payload, 200) as $chunk) {
+            $chunkSize = 80; // safely under SQLite parameter limits
+            foreach (array_chunk($payload, $chunkSize) as $chunk) {
                 PkdCode::upsert($chunk, ['code', 'version'], ['name', 'parent_code', 'level', 'is_leaf', 'updated_at']);
                 $total += count($chunk);
             }
