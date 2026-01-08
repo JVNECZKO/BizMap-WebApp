@@ -13,12 +13,14 @@
     <p class="text-sm text-slate-700">Ostatnie generowanie: {{ $lastGenerated ?? 'brak danych' }}</p>
     <div class="space-y-3">
         <button id="start-sitemap" class="px-5 py-3 rounded-xl bg-slate-900 text-white shadow-panel">Generuj sitemapę (AJAX)</button>
+        <button id="clear-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Usuń wszystkie sitemap</button>
         <div id="sitemap-status" class="text-sm text-slate-600">Oczekiwanie...</div>
     </div>
     @if(!empty($files))
         <div class="pt-4">
             <p class="text-sm font-semibold text-slate-800 mb-2">Dostępne pliki sitemap</p>
             <ul class="text-sm text-slate-700 list-disc list-inside space-y-1">
+                <li><a class="text-sky-700 hover:text-sky-900 font-semibold" href="/sitemap.xml" target="_blank">sitemap.xml (index)</a></li>
                 @foreach($files as $file)
                     <li><a class="text-sky-700 hover:text-sky-900" href="/{{ $file }}" target="_blank">{{ $file }}</a></li>
                 @endforeach
@@ -41,6 +43,17 @@
         runChunk();
     });
 
+    document.getElementById('clear-sitemap').addEventListener('click', async () => {
+        if (running) return;
+        statusEl.innerText = 'Usuwam stare sitemap...';
+        const res = await fetch('{{ route('admin.sitemap.clear') }}', {method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}});
+        if (res.ok) {
+            statusEl.innerText = 'Usunięto wszystkie sitemap.';
+        } else {
+            statusEl.innerText = 'Błąd przy usuwaniu sitemap.';
+        }
+    });
+
     async function runChunk() {
         const res = await fetch('{{ route('admin.sitemap.run') }}', {method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}});
         if (!res.ok) {
@@ -50,10 +63,10 @@
         }
         const data = await res.json();
         if (data.status === 'running') {
-            statusEl.innerText = `Przetwarzanie... plik: ${data.file} (łącznie ${data.files_count})`;
+            statusEl.innerText = `Przetwarzanie... plik: ${data.file} (łącznie ${data.files_count}), zapisanych rekordów: ${data.processed}`;
             setTimeout(runChunk, 200);
         } else if (data.status === 'finished') {
-            statusEl.innerText = 'Zakończono generowanie sitemap.';
+            statusEl.innerText = `Zakończono generowanie sitemap. Przetworzono ${data.total_processed} rekordów.`;
             running = false;
         } else {
             statusEl.innerText = 'Brak aktywnego zadania.';

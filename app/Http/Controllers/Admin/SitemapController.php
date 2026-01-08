@@ -29,4 +29,11 @@ class SitemapController extends Controller
 
         return response()->json($result);
     }
+
+    public function clear(SitemapService $sitemapService)
+    {
+        $sitemapService->clearAll();
+
+        return response()->json(['status' => 'cleared']);
+    }
 }

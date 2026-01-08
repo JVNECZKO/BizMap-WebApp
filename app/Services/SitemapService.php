@@ -22,6 +22,16 @@ class SitemapService
         return $files;
     }
 
+    public function clearAll(): void
+    {
+        foreach (File::glob(public_path('sitemap-companies-*.xml')) as $old) {
+            @File::delete($old);
+        }
+        @File::delete(public_path('sitemap.xml'));
+        Cache::forget($this->jobKey);
+        Setting::setValue('sitemap.last_generated_at', null);
+    }
+
     public function start(): void
     {
         // wyczyść stare pliki
@@ -34,6 +44,7 @@ class SitemapService
             'last_id' => 0,
             'file_index' => 1,
             'files' => [],
+            'processed' => 0,
         ];
 
         Cache::forever($this->jobKey, $state);
@@ -62,6 +73,7 @@ class SitemapService
             return [
                 'status' => 'finished',
                 'files' => $state['files'],
+                'total_processed' => $state['processed'],
             ];
         }
 
@@ -72,6 +84,7 @@ class SitemapService
         $state['files'][] = $fileName;
         $state['last_id'] = $chunk->last()->id;
         $state['file_index']++;
+        $state['processed'] += $chunk->count();
 
         Cache::forever($this->jobKey, $state);
 
@@ -80,6 +93,7 @@ class SitemapService
             'file' => $fileName,
             'last_id' => $state['last_id'],
             'files_count' => count($state['files']),
+            'processed' => $state['processed'],
         ];
     }
 

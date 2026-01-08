@@ -82,6 +82,7 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::get('/sitemap', [AdminSitemapController::class, 'index'])->name('sitemap.index');
     Route::post('/sitemap/start', [AdminSitemapController::class, 'start'])->name('sitemap.start');
     Route::post('/sitemap/run', [AdminSitemapController::class, 'run'])->name('sitemap.run');
+    Route::post('/sitemap/clear', [AdminSitemapController::class, 'clear'])->name('sitemap.clear');
 
     Route::get('/debug', [\App\Http\Controllers\Admin\DebugController::class, 'index'])->name('debug.index');
     Route::post('/debug', [\App\Http\Controllers\Admin\DebugController::class, 'update'])->name('debug.update');
