@@ -40,14 +40,22 @@
         if (running) return;
         running = true;
         statusEl.innerText = 'Start generowania...';
-        await fetch('{{ route('admin.sitemap.start') }}', {method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}});
+        await fetch('{{ route('admin.sitemap.start') }}', {
+            method:'POST',
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            credentials:'same-origin'
+        });
         runChunk();
     });
 
     document.getElementById('clear-sitemap').addEventListener('click', async () => {
         if (running) return;
         statusEl.innerText = 'Usuwam stare sitemap...';
-        const res = await fetch('{{ route('admin.sitemap.clear') }}', {method:'POST', headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'}});
+        const res = await fetch('{{ route('admin.sitemap.clear') }}', {
+            method:'POST',
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            credentials:'same-origin'
+        });
         if (res.ok) {
             statusEl.innerText = 'Usunięto wszystkie sitemap.';
         } else {
@@ -63,6 +71,7 @@
                 'Content-Type':'application/json',
                 'Accept':'application/json'
             },
+            credentials:'same-origin',
             body: JSON.stringify({steps: stepsPerCall})
         });
         if (res.status === 403) {
