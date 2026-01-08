@@ -67,8 +67,13 @@ class ImportPkdCommand extends Command
                 continue;
             }
 
-            PkdCode::upsert($payload, ['code', 'version'], ['name', 'parent_code', 'level', 'is_leaf', 'updated_at']);
-            $this->info("Zaimportowano " . count($payload) . " pozycji PKD {$version}");
+            $total = 0;
+            foreach (array_chunk($payload, 200) as $chunk) {
+                PkdCode::upsert($chunk, ['code', 'version'], ['name', 'parent_code', 'level', 'is_leaf', 'updated_at']);
+                $total += count($chunk);
+            }
+
+            $this->info("Zaimportowano " . $total . " pozycji PKD {$version}");
         }
 
         return Command::SUCCESS;
