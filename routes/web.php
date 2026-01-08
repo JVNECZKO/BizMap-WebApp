@@ -70,6 +70,10 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::get('/kontakt/{message}', [\App\Http\Controllers\Admin\ContactSettingsController::class, 'show'])->name('contact.show');
     Route::get('/lokalizacje', [\App\Http\Controllers\Admin\LocationController::class, 'index'])->name('locations.index');
     Route::post('/lokalizacje/rebuild', [\App\Http\Controllers\Admin\LocationController::class, 'rebuild'])->name('locations.rebuild');
+    Route::get('/pkd', [\App\Http\Controllers\Admin\PkdController::class, 'index'])->name('pkd.index');
+    Route::post('/pkd/import', [\App\Http\Controllers\Admin\PkdController::class, 'import'])->name('pkd.import');
+    Route::post('/pkd/normalize', [\App\Http\Controllers\Admin\PkdController::class, 'normalize'])->name('pkd.normalize');
+    Route::post('/pkd/recount', [\App\Http\Controllers\Admin\PkdController::class, 'recount'])->name('pkd.recount');
     Route::get('/konto', [\App\Http\Controllers\Admin\AccountController::class, 'edit'])->name('account.edit');
     Route::post('/konto', [\App\Http\Controllers\Admin\AccountController::class, 'update'])->name('account.update');
     Route::get('/two-factor', [\App\Http\Controllers\Admin\TwoFactorController::class, 'show'])->name('2fa.show');

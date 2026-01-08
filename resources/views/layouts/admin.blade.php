@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
         $logoPath = \App\Models\Setting::get('branding.logo');
         $faviconPath = \App\Models\Setting::get('branding.favicon');
@@ -54,6 +55,7 @@
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.contact.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.contact.index') }}">Kontakt</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.database.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.database.index') }}">Baza danych</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.locations.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.locations.index') }}">Powiązania lokalizacji</a>
+                <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.pkd.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.pkd.index') }}">PKD</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.account.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.account.edit') }}">Konto</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.sitemap.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.sitemap.index') }}">Sitemapa</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.debug.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.debug.index') }}">Debugowanie</a>
