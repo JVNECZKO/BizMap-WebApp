@@ -2,7 +2,11 @@
     Options +FollowSymLinks
     RewriteEngine On
 
-    # Jeśli aplikacja jest w katalogu głównym na hostingu współdzielonym, kieruj wszystko do /public
+    # Przekieruj adresy z /public/... na root (unikamy URL-i z /public)
+    RewriteCond %{REQUEST_URI} ^/public/(.*)$
+    RewriteRule ^public/(.*)$ /$1 [L,R=301]
+
+    # Wszystko inne kieruj do katalogu /public (shared hosting bez zmiany docroot)
     RewriteCond %{REQUEST_URI} !^/public/
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
