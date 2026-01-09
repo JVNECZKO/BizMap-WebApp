@@ -72,5 +72,59 @@
             </div>
         </div>
     </div>
+
+    <div class="grid md:grid-cols-3 gap-5 mt-8">
+        <div class="md:col-span-1 p-5 rounded-2xl bg-white shadow-card border border-slate-100">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-3">Inne firmy z tej samej branży (PKD)</p>
+            @if($samePkd->isEmpty())
+                <p class="text-sm text-slate-500">Brak danych.</p>
+            @else
+                <ul class="space-y-2 text-sm text-slate-800">
+                    @foreach($samePkd as $item)
+                        <li>
+                            <a class="hover:text-sky-700" href="{{ route('company.show', ['id' => $item->id, 'slug' => $item->slug]) }}">
+                                {{ $item->full_name }}
+                            </a>
+                            <p class="text-xs text-slate-500">{{ $item->miejscowosc ?? '' }} {{ $item->powiat ? '• '.$item->powiat : '' }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+        <div class="md:col-span-1 p-5 rounded-2xl bg-white shadow-card border border-slate-100">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-3">Firmy w tej samej miejscowości</p>
+            @if($sameCity->isEmpty())
+                <p class="text-sm text-slate-500">Brak danych.</p>
+            @else
+                <ul class="space-y-2 text-sm text-slate-800">
+                    @foreach($sameCity as $item)
+                        <li>
+                            <a class="hover:text-sky-700" href="{{ route('company.show', ['id' => $item->id, 'slug' => $item->slug]) }}">
+                                {{ $item->full_name }}
+                            </a>
+                            <p class="text-xs text-slate-500">{{ $item->glowny_kod_pkd ?? '' }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+        <div class="md:col-span-1 p-5 rounded-2xl bg-white shadow-card border border-slate-100">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-3">Podobne działalności w regionie</p>
+            @if($sameRegion->isEmpty())
+                <p class="text-sm text-slate-500">Brak danych.</p>
+            @else
+                <ul class="space-y-2 text-sm text-slate-800">
+                    @foreach($sameRegion as $item)
+                        <li>
+                            <a class="hover:text-sky-700" href="{{ route('company.show', ['id' => $item->id, 'slug' => $item->slug]) }}">
+                                {{ $item->full_name }}
+                            </a>
+                            <p class="text-xs text-slate-500">{{ $item->miejscowosc ?? '' }} {{ $item->glowny_kod_pkd ? '• '.$item->glowny_kod_pkd : '' }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+    </div>
 </div>
 @endsection
