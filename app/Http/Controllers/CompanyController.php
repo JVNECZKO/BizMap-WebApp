@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\PkdCode;
 use App\Models\Setting;
 use App\Services\BusinessSearchService;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
@@ -61,6 +62,26 @@ class CompanyController extends Controller
                 ->get();
         }
 
+        $pkdSlug = null;
+        if ($business->glowny_kod_pkd && $pkdNames->has($business->glowny_kod_pkd)) {
+            $pkdSlug = Str::slug($business->glowny_kod_pkd . ' ' . $pkdNames[$business->glowny_kod_pkd]->name);
+        }
+
+        $hotBusinesses = Business::query()
+            ->select(['id', 'full_name', 'slug', 'miejscowosc', 'wojewodztwo', 'glowny_kod_pkd'])
+            ->where('imported_at', '>=', now()->subDays(7))
+            ->orderByDesc('imported_at')
+            ->limit(6)
+            ->get();
+
+        if ($hotBusinesses->isEmpty()) {
+            $hotBusinesses = Business::query()
+                ->select(['id', 'full_name', 'slug', 'miejscowosc', 'wojewodztwo', 'glowny_kod_pkd'])
+                ->orderByDesc('imported_at')
+                ->limit(6)
+                ->get();
+        }
+
         return view('companies.show', [
             'business' => $business,
             'pkdNames' => $pkdNames,
@@ -68,6 +89,8 @@ class CompanyController extends Controller
             'samePkd' => $samePkd,
             'sameCity' => $sameCity,
             'sameRegion' => $sameRegion,
+            'pkdSlug' => $pkdSlug,
+            'hotBusinesses' => $hotBusinesses,
         ]);
     }
 }
