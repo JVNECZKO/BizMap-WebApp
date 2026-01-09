@@ -58,7 +58,7 @@
 
     <div class="flex items-center justify-between mt-6 text-sm flex-wrap gap-4">
         <div>
-            Strona {{ $businesses->currentPage() }} z {{ $businesses->lastPage() }}
+            Strona {{ $businesses->currentPage() }}
         </div>
         <div class="flex items-center gap-3">
             @if($businesses->previousPageUrl())
