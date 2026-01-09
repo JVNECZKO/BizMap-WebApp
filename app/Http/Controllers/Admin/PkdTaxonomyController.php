@@ -40,6 +40,7 @@ class PkdTaxonomyController extends Controller
         }
 
         PkdTaxonomy::truncate();
+        \Cache::forget('taxonomy_counts');
         foreach ($rows as $row) {
             if (count($row) < 4) {
                 continue;
@@ -81,12 +82,15 @@ class PkdTaxonomyController extends Controller
             'secondary_codes' => $secondaryCodes,
         ]);
 
+        \Cache::forget('taxonomy_counts');
+
         return back()->with('status', 'Zapisano zmiany.');
     }
 
     public function destroyAll()
     {
         PkdTaxonomy::truncate();
+        \Cache::forget('taxonomy_counts');
         return back()->with('status', 'Usunięto wszystkie rekordy.');
     }
 }

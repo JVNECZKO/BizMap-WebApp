@@ -36,6 +36,7 @@ Route::get('/o-nas', [\App\Http\Controllers\PageController::class, 'about'])->na
 Route::get('/kontakt', [\App\Http\Controllers\PageController::class, 'contact'])->name('contact');
 Route::post('/kontakt', [\App\Http\Controllers\ContactFormController::class, 'send'])->name('contact.send');
 Route::get('/polityka-prywatnosci', [\App\Http\Controllers\PageController::class, 'privacy'])->name('privacy');
+Route::get('/branze', [\App\Http\Controllers\TaxonomyController::class, 'index'])->name('taxonomy.public');
 
 Route::get('/login', [AdminAuthController::class, 'showLogin'])->middleware('guest')->name('login');
 Route::post('/login', [AdminAuthController::class, 'login'])->middleware('guest')->name('login.submit');

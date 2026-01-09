@@ -83,6 +83,7 @@
                     <a href="{{ route('landing') }}" class="text-slate-600 hover:text-slate-900 transition">Strona główna</a>
                     <a href="{{ route('companies.index') }}" class="text-slate-600 hover:text-slate-900 transition">Firmy</a>
                     <a href="{{ route('pkd.index') }}" class="text-slate-600 hover:text-slate-900 transition">PKD</a>
+                    <a href="{{ route('taxonomy.public') }}" class="text-slate-600 hover:text-slate-900 transition">Branże</a>
                     <a href="{{ route('about') }}" class="text-slate-600 hover:text-slate-900 transition">O nas</a>
                     <a href="{{ route('contact') }}" class="text-slate-600 hover:text-slate-900 transition">Kontakt</a>
                 </div>
@@ -92,6 +93,7 @@
                     <a href="{{ route('landing') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Strona główna</a>
                     <a href="{{ route('companies.index') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Firmy</a>
                     <a href="{{ route('pkd.index') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">PKD</a>
+                    <a href="{{ route('taxonomy.public') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Branże</a>
                     <a href="{{ route('about') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">O nas</a>
                     <a href="{{ route('contact') }}" class="text-slate-600 hover:text-slate-900 transition nav-link">Kontakt</a>
                 </div>
