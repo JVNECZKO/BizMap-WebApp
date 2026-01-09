@@ -75,6 +75,10 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::post('/pkd/import', [\App\Http\Controllers\Admin\PkdController::class, 'import'])->name('pkd.import');
     Route::post('/pkd/normalize', [\App\Http\Controllers\Admin\PkdController::class, 'normalize'])->name('pkd.normalize');
     Route::post('/pkd/recount', [\App\Http\Controllers\Admin\PkdController::class, 'recount'])->name('pkd.recount');
+    Route::get('/pkd-taksonomia', [\App\Http\Controllers\Admin\PkdTaxonomyController::class, 'index'])->name('taxonomy.index');
+    Route::post('/pkd-taksonomia/import', [\App\Http\Controllers\Admin\PkdTaxonomyController::class, 'import'])->name('taxonomy.import');
+    Route::put('/pkd-taksonomia/{taxonomy}', [\App\Http\Controllers\Admin\PkdTaxonomyController::class, 'update'])->name('taxonomy.update');
+    Route::delete('/pkd-taksonomia', [\App\Http\Controllers\Admin\PkdTaxonomyController::class, 'destroyAll'])->name('taxonomy.destroyAll');
     Route::get('/konto', [\App\Http\Controllers\Admin\AccountController::class, 'edit'])->name('account.edit');
     Route::post('/konto', [\App\Http\Controllers\Admin\AccountController::class, 'update'])->name('account.update');
     Route::get('/two-factor', [\App\Http\Controllers\Admin\TwoFactorController::class, 'show'])->name('2fa.show');

@@ -64,6 +64,7 @@
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.locations.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.locations.index') }}">Powiązania lokalizacji</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.ads.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.ads.index') }}">Reklamy</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.pkd.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.pkd.index') }}">PKD</a>
+                <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.taxonomy.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.taxonomy.index') }}">Branże PKD</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.account.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.account.edit') }}">Konto</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.sitemap.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.sitemap.index') }}">Sitemapa</a>
                 <a class="block px-4 py-3 rounded-xl hover:bg-slate-100 {{ request()->routeIs('admin.debug.*') ? 'bg-slate-100 font-semibold' : '' }}" href="{{ route('admin.debug.index') }}">Debugowanie</a>
