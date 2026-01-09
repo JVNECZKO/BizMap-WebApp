@@ -249,13 +249,24 @@
             </select>
         </form>
         <div class="flex items-center gap-3">
-            @if($results->previousPageUrl())
-                <a class="px-4 py-2 rounded-lg border border-slate-200" href="{{ $results->previousPageUrl() }}">← Poprzednie</a>
+            @php
+                $queryParams = array_filter(request()->except('cursor'));
+                $prevUrl = $results->previousPageUrl();
+                $nextUrl = $results->nextPageUrl();
+                if ($prevUrl && $queryParams) {
+                    $prevUrl .= (str_contains($prevUrl, '?') ? '&' : '?') . http_build_query($queryParams);
+                }
+                if ($nextUrl && $queryParams) {
+                    $nextUrl .= (str_contains($nextUrl, '?') ? '&' : '?') . http_build_query($queryParams);
+                }
+            @endphp
+            @if($prevUrl)
+                <a class="px-4 py-2 rounded-lg border border-slate-200" href="{{ $prevUrl }}">← Poprzednie</a>
             @else
                 <span class="px-4 py-2 rounded-lg border border-slate-100 text-slate-400">← Poprzednie</span>
             @endif
-            @if($results->nextPageUrl())
-                <a class="px-4 py-2 rounded-lg bg-slate-900 text-white shadow-card" href="{{ $results->nextPageUrl() }}">Następne →</a>
+            @if($nextUrl)
+                <a class="px-4 py-2 rounded-lg bg-slate-900 text-white shadow-card" href="{{ $nextUrl }}">Następne →</a>
             @else
                 <span class="px-4 py-2 rounded-lg border border-slate-100 text-slate-400">Następne →</span>
             @endif
