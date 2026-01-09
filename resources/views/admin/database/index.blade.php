@@ -119,7 +119,7 @@ saveBtn?.addEventListener('click', async () => {
     const payload = Object.fromEntries(new FormData(form));
     try {
         statusText.textContent = 'Zapisuję...';
-        await post('{{ route('database.migration.save') }}', payload);
+        await post('{{ route('admin.database.migration.save') }}', payload);
         statusText.textContent = 'Zapisano konfigurację docelowej bazy.';
     } catch(e) {
         statusText.textContent = e.message;
@@ -129,7 +129,7 @@ saveBtn?.addEventListener('click', async () => {
 clearBtn?.addEventListener('click', async () => {
     try {
         statusText.textContent = 'Usuwam konfigurację...';
-        await post('{{ route('database.migration.clear') }}');
+        await post('{{ route('admin.database.migration.clear') }}');
         statusText.textContent = 'Usunięto.';
     } catch(e) {
         statusText.textContent = e.message;
@@ -140,7 +140,7 @@ runBtn?.addEventListener('click', async () => {
     try {
         statusText.textContent = 'Migracja w toku...';
         logBox.textContent = 'Start...';
-        const data = await post('{{ route('database.migration.run') }}');
+        const data = await post('{{ route('admin.database.migration.run') }}');
         logBox.textContent = (data.log || []).join("\\n");
         statusText.textContent = data.message || 'Zakończono.';
     } catch(e) {
