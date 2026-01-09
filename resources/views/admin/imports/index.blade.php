@@ -226,6 +226,9 @@
         runChunk(mapping, staticValues);
     });
 
+    let retryCount = 0;
+    const maxRetries = 5;
+
     async function runChunk(mapping, staticValues) {
         let data = {};
         try {
@@ -243,7 +246,14 @@
             if (!res.ok) {
                 throw new Error(data.error || 'Błąd importu');
             }
+            retryCount = 0; // reset po udanym kroku
         } catch (err) {
+            retryCount++;
+            if (retryCount <= maxRetries) {
+                const backoff = 2000 * retryCount;
+                document.getElementById('progress-text').innerText = `Błąd (próba ${retryCount}/${maxRetries}). Czekam ${backoff/1000}s i wznawiam...`;
+                return setTimeout(() => runChunk(mapping, staticValues), backoff);
+            }
             document.getElementById('progress-text').innerText = err.message || 'Błąd importu (szczegóły w logach).';
             return;
         }

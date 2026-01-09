@@ -10,6 +10,7 @@ return [
 
     'import' => [
         'chunk' => env('BIZMAP_IMPORT_CHUNK', 2000),
+        'mysql_chunk' => env('BIZMAP_IMPORT_MYSQL_CHUNK', 5000),
         'preview_rows' => env('BIZMAP_IMPORT_PREVIEW_ROWS', 15),
         'allowed_formats' => ['csv', 'json', 'xml', 'xls', 'xlsx'],
     ],

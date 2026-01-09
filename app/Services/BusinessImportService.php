@@ -338,7 +338,11 @@ class BusinessImportService
 
     protected function businessChunkSize(): int
     {
-        return $this->sqlite() ? 30 : config('bizmap.import.chunk', 500);
+        if ($this->sqlite()) {
+            return 30;
+        }
+
+        return (int) config('bizmap.import.mysql_chunk', config('bizmap.import.chunk', 5000));
     }
 
     protected function pivotChunkSize(): int
