@@ -43,7 +43,6 @@ class SitemapService
 
     public function start(): void
     {
-        // wyczyść stare pliki
         $this->clearAll();
 
         $pkdVersion = Setting::get('pkd.version', '2007');
@@ -82,6 +81,36 @@ class SitemapService
         Cache::forever($this->jobKey, $state);
     }
 
+    public function startUpdate(): void
+    {
+        $existingFiles = $this->listFiles();
+        $lastBusinessId = (int) Setting::get('sitemap.last_business_id', 0);
+
+        $maxCompanyIndex = 0;
+        foreach ($existingFiles as $f) {
+            if (preg_match('/sitemap-companies-(\d+)\.xml$/', $f, $m)) {
+                $maxCompanyIndex = max($maxCompanyIndex, (int) $m[1]);
+            }
+        }
+
+        $state = [
+            'phase' => 'companies',
+            'last_id' => $lastBusinessId,
+            'file_index' => $maxCompanyIndex ? $maxCompanyIndex + 1 : 1,
+            'files' => $existingFiles,
+            'processed' => 0,
+            'skip_pkd' => true,
+            'pkd' => [
+                'codes' => [],
+                'regions' => [],
+                'code_index' => 0,
+                'region_index' => 0,
+            ],
+        ];
+
+        Cache::forever($this->jobKey, $state);
+    }
+
     public function runChunk(int $steps = 1): array
     {
         $state = Cache::get($this->jobKey);
@@ -103,7 +132,18 @@ class SitemapService
                     ->get();
 
                 if ($chunk->isEmpty()) {
-                    // przechodzimy do fazy pkd
+                    if (!empty($state['skip_pkd'])) {
+                        $indexXml = $this->renderIndex($state['files']);
+                        File::put(public_path('sitemap.xml'), $indexXml);
+                        Setting::setValue('sitemap.last_generated_at', now()->toDateTimeString());
+                        Cache::forget($this->jobKey);
+
+                        return [
+                            'status' => 'finished',
+                            'files' => $state['files'],
+                            'total_processed' => $state['processed'],
+                        ];
+                    }
                     $state['phase'] = 'pkd';
                     $state['last_id'] = 0;
                     continue;
@@ -178,6 +218,7 @@ class SitemapService
         }
 
         Cache::forever($this->jobKey, $state);
+        Setting::setValue('sitemap.last_business_id', $state['last_id']);
 
         return [
             'status' => 'running',

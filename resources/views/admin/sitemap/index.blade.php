@@ -12,7 +12,8 @@
 <div class="bg-white shadow-panel rounded-2xl border border-slate-100 p-6 space-y-4">
     <p class="text-sm text-slate-700">Ostatnie generowanie: {{ $lastGenerated ?? 'brak danych' }}</p>
     <div class="space-y-3">
-        <button id="start-sitemap" class="px-5 py-3 rounded-xl bg-slate-900 text-white shadow-panel">Generuj sitemapę (AJAX)</button>
+        <button id="start-sitemap" class="px-5 py-3 rounded-xl bg-slate-900 text-white shadow-panel">Generuj sitemapę (pełne)</button>
+        <button id="update-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Aktualizuj sitemapę (tylko nowe firmy)</button>
         <button id="clear-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Usuń wszystkie sitemap</button>
         <div id="sitemap-status" class="text-sm text-slate-600">Oczekiwanie...</div>
     </div>
@@ -33,6 +34,7 @@
 <script>
     const statusEl = document.getElementById('sitemap-status');
     const btn = document.getElementById('start-sitemap');
+    const btnUpdate = document.getElementById('update-sitemap');
     let running = false;
     let stepsPerCall = 5;
 
@@ -61,6 +63,18 @@
         } else {
             statusEl.innerText = 'Błąd przy usuwaniu sitemap.';
         }
+    });
+
+    btnUpdate.addEventListener('click', async () => {
+        if (running) return;
+        running = true;
+        statusEl.innerText = 'Start aktualizacji (tylko nowe firmy)...';
+        await fetch('{{ route('admin.sitemap.update') }}', {
+            method:'POST',
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            credentials:'same-origin'
+        });
+        runChunk();
     });
 
     async function runChunk() {

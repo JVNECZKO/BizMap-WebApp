@@ -23,6 +23,13 @@ class SitemapController extends Controller
         return response()->json(['status' => 'started']);
     }
 
+    public function update(SitemapService $sitemapService)
+    {
+        $sitemapService->startUpdate();
+
+        return response()->json(['status' => 'started']);
+    }
+
     public function run(SitemapService $sitemapService)
     {
         $steps = (int) request()->input('steps', 10);

@@ -82,6 +82,7 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
 
     Route::get('/sitemap', [AdminSitemapController::class, 'index'])->name('sitemap.index');
     Route::post('/sitemap/start', [AdminSitemapController::class, 'start'])->name('sitemap.start');
+    Route::post('/sitemap/update', [AdminSitemapController::class, 'update'])->name('sitemap.update');
     Route::post('/sitemap/run', [AdminSitemapController::class, 'run'])->name('sitemap.run');
     Route::post('/sitemap/clear', [AdminSitemapController::class, 'clear'])->name('sitemap.clear');
     Route::get('/reklamy', [\App\Http\Controllers\Admin\AdsController::class, 'index'])->name('ads.index');
