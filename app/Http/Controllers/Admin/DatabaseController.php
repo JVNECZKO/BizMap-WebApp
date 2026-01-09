@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseController extends Controller
 {
     protected array $businessIdMap = [];
+    protected array $businessIdMapOldToNew = [];
 
     public function index()
     {
@@ -124,11 +126,15 @@ class DatabaseController extends Controller
     public function migrationClear()
     {
         Setting::setValue('migration.target', null, 'json');
+        Setting::setValue('migration.state', null, 'json');
 
         return back()->with('status', 'Usunięto konfigurację migracji.');
     }
 
-    public function migrationRun()
+    /**
+     * Start krokowej migracji: schema + reset mapy + stan.
+     */
+    public function migrationStart()
     {
         $target = Setting::get('migration.target');
         if (! is_array($target) || empty($target['database'])) {
@@ -156,57 +162,101 @@ class DatabaseController extends Controller
             return response()->json(['error' => 'Migracja schematu nie powiodła się: ' . $e->getMessage(), 'log' => $log], 500);
         }
 
-        $tables = [
-            'businesses' => 'id',
-            'business_pkd_codes' => 'id',
-            'business_raw_payloads' => 'id',
-            'pkd_codes' => 'id',
-            'pkd_popularity' => 'pkd_code',
-            'import_logs' => 'id',
-            'import_mappings' => 'id',
-            'settings' => 'id',
+        $this->ensureMigrationMapTable(DB::connection('migration'), true);
+
+        $state = [
+            'status' => 'running',
+            'table_index' => 0,
+            'offset' => 0,
+            'chunk' => 500,
         ];
+        Setting::setValue('migration.state', $state, 'json');
+        $this->logStep($log, 'Schemat gotowy. Start migracji krokowej.');
 
-        foreach ($tables as $table => $orderBy) {
-            try {
-                $this->copyTable($table, $orderBy, $log);
-            } catch (\Throwable $e) {
-                $this->logStep($log, "❌ Błąd kopiowania {$table}: " . $e->getMessage());
-                \Log::error('Migration copy table failed', ['table' => $table, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-                return response()->json(['error' => "Migracja przerwana na tabeli {$table}: " . $e->getMessage(), 'log' => $log], 500);
-            }
-        }
-
-        $this->logStep($log, 'Migracja danych zakończona. Możesz teraz bezpiecznie przełączyć bazę danych.');
-
-        return response()->json(['ok' => true, 'log' => $log, 'message' => 'Możesz teraz bezpiecznie przełączyć bazę danych.']);
+        return response()->json(['ok' => true, 'log' => $log, 'status' => 'running']);
     }
 
-    protected function copyTable(string $table, string $orderBy, array &$log): void
+    /**
+     * Jeden krok migracji – kopiuje chunk bieżącej tabeli.
+     */
+    public function migrationRun()
     {
-        $source = DB::connection(); // aktualna (sqlite)
-        $target = DB::connection('migration');
-        $chunk = 500;
+        $state = Setting::get('migration.state');
+        if (! is_array($state) || ($state['status'] ?? null) !== 'running') {
+            return response()->json(['error' => 'Brak aktywnej migracji. Rozpocznij od „Utwórz schemat i migruj dane”.'], 422);
+        }
 
-        $total = $source->table($table)->count();
-        $this->logStep($log, "Kopiuję tabelę {$table} ({$total} rekordów)...");
+        $target = Setting::get('migration.target');
+        if (! is_array($target) || empty($target['database'])) {
+            return response()->json(['error' => 'Brak zapisanej konfiguracji bazy docelowej.'], 422);
+        }
 
-        $source->table($table)->orderBy($orderBy)->chunk($chunk, function ($rows) use ($target, $table, &$log) {
-            $payload = [];
-            foreach ($rows as $row) {
-                $payload[] = (array) $row;
-            }
+        $config = $this->buildConnectionConfig($target);
+        Config::set('database.connections.migration', $config);
 
-            if ($table === 'businesses') {
-                $this->migrateBusinesses($target, $payload, $log);
-            } elseif (in_array($table, ['business_pkd_codes', 'business_raw_payloads'], true)) {
-                $this->migrateBusinessChildren($target, $table, $payload, $log);
-            } elseif ($table === 'pkd_codes') {
-                $this->migratePkdCodes($target, $payload, $log);
+        try {
+            DB::purge('migration');
+            DB::connection('migration')->getPdo();
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Połączenie z bazą docelową nie działa: ' . $e->getMessage()], 500);
+        }
+
+        $tables = $this->migrationTables();
+        $index = $state['table_index'] ?? 0;
+        $offset = $state['offset'] ?? 0;
+        $chunk = $state['chunk'] ?? 500;
+        $log = [];
+
+        if ($index >= count($tables)) {
+            $state['status'] = 'finished';
+            Setting::setValue('migration.state', $state, 'json');
+            $this->logStep($log, 'Migracja danych zakończona. Możesz teraz bezpiecznie przełączyć bazę danych.');
+            return response()->json(['ok' => true, 'log' => $log, 'message' => 'Możesz teraz bezpiecznie przełączyć bazę danych.', 'status' => 'finished']);
+        }
+
+        $table = $tables[$index];
+        $name = $table['name'];
+        $orderBy = $table['order'];
+
+        $source = DB::connection(); // sqlite
+        $targetConn = DB::connection('migration');
+
+        $rows = $source->table($name)->orderBy($orderBy)->offset($offset)->limit($chunk)->get()->map(fn($r) => (array) $r)->all();
+
+        if (empty($rows)) {
+            $state['table_index'] = $index + 1;
+            $state['offset'] = 0;
+            Setting::setValue('migration.state', $state, 'json');
+            $this->logStep($log, "✔ {$name}: ukończono.");
+            return response()->json(['ok' => true, 'log' => $log, 'status' => 'running', 'next_table' => $state['table_index']]);
+        }
+
+        $this->ensureMigrationMapTable($targetConn);
+        $this->businessIdMap = [];
+        $this->businessIdMapOldToNew = [];
+
+        try {
+            if ($name === 'businesses') {
+                $this->migrateBusinesses($targetConn, $rows, $log);
+            } elseif (in_array($name, ['business_pkd_codes', 'business_raw_payloads'], true)) {
+                $this->migrateBusinessChildren($targetConn, $name, $rows, $log);
+            } elseif ($name === 'pkd_codes') {
+                $this->migratePkdCodes($targetConn, $rows, $log);
             } else {
-                $this->insertGeneric($target, $table, $payload, $log);
+                $this->insertGeneric($targetConn, $name, $rows, $log);
             }
-        });
+        } catch (\Throwable $e) {
+            $this->logStep($log, "❌ Błąd kopiowania {$name}: " . $e->getMessage());
+            \Log::error('Migration chunk failed', ['table' => $name, 'offset' => $offset, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => "Migracja przerwana na tabeli {$name}: " . $e->getMessage(), 'log' => $log], 500);
+        }
+
+        $state['offset'] = $offset + count($rows);
+        Setting::setValue('migration.state', $state, 'json');
+
+        $this->logStep($log, "✔ {$name}: przeniesiono " . count($rows) . " rekordów (offset: {$state['offset']}).");
+
+        return response()->json(['ok' => true, 'log' => $log, 'status' => 'running']);
     }
 
     protected function migrateBusinesses($target, array $rows, array &$log): void
@@ -242,6 +292,10 @@ class DatabaseController extends Controller
                 $this->businessIdMap[$item->slug] = $item->id;
                 if (isset($oldBySlug[$item->slug])) {
                     $this->businessIdMapOldToNew[$oldBySlug[$item->slug]] = $item->id;
+                    $target->table('migration_business_map')->updateOrInsert(
+                        ['old_id' => $oldBySlug[$item->slug]],
+                        ['slug' => $item->slug, 'new_id' => $item->id]
+                    );
                 }
             }
         }
@@ -259,13 +313,15 @@ class DatabaseController extends Controller
         foreach ($rows as $row) {
             unset($row['id']);
             $bizId = $row['business_id'] ?? null;
-            if ($bizId && isset($this->businessIdMapOldToNew[$bizId])) {
+            $mapped = $target->table('migration_business_map')->where('old_id', $bizId)->first();
+            if ($mapped && $mapped->new_id) {
+                $row['business_id'] = $mapped->new_id;
+            } elseif ($bizId && isset($this->businessIdMapOldToNew[$bizId])) {
                 $row['business_id'] = $this->businessIdMapOldToNew[$bizId];
             } else {
-                continue; // brak mapy, pomijamy
+                continue;
             }
 
-            // jeżeli nadal nie mamy business_id w mapie docelowej, pomijamy wiersz
             if (! isset($row['business_id']) || ! $row['business_id']) {
                 continue;
             }
@@ -320,6 +376,35 @@ class DatabaseController extends Controller
         }
 
         $this->logStep($log, "✔ {$table}: " . count($rows) . " rekordów przeniesiono.");
+    }
+
+    protected function ensureMigrationMapTable($connection, bool $reset = false): void
+    {
+        $schema = Schema::connection($connection->getName());
+        if (! $schema->hasTable('migration_business_map')) {
+            $schema->create('migration_business_map', function ($table) {
+                $table->unsignedBigInteger('old_id')->unique();
+                $table->string('slug')->nullable();
+                $table->unsignedBigInteger('new_id')->nullable();
+                $table->index('slug');
+            });
+        } elseif ($reset) {
+            $connection->table('migration_business_map')->truncate();
+        }
+    }
+
+    protected function migrationTables(): array
+    {
+        return [
+            ['name' => 'businesses', 'order' => 'id'],
+            ['name' => 'business_pkd_codes', 'order' => 'id'],
+            ['name' => 'business_raw_payloads', 'order' => 'id'],
+            ['name' => 'pkd_codes', 'order' => 'id'],
+            ['name' => 'pkd_popularity', 'order' => 'pkd_code'],
+            ['name' => 'import_logs', 'order' => 'id'],
+            ['name' => 'import_mappings', 'order' => 'id'],
+            ['name' => 'settings', 'order' => 'id'],
+        ];
     }
 
     protected function logStep(array &$log, string $message): void

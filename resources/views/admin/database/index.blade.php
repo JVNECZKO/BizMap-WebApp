@@ -138,11 +138,25 @@ clearBtn?.addEventListener('click', async () => {
 
 runBtn?.addEventListener('click', async () => {
     try {
-        statusText.textContent = 'Migracja w toku...';
+        statusText.textContent = 'Start migracji...';
         logBox.textContent = 'Start...';
-        const data = await post('{{ route('admin.database.migration.run') }}');
-        logBox.textContent = (data.log || []).join("\\n");
-        statusText.textContent = data.message || 'Zakończono.';
+        let resp = await post('{{ route('admin.database.migration.start') }}');
+        logBox.textContent = (resp.log || []).join("\n");
+        statusText.textContent = 'Migracja krokowa trwa...';
+
+        let keepGoing = true;
+        while (keepGoing) {
+            resp = await post('{{ route('admin.database.migration.run') }}');
+            if (resp.log) {
+                logBox.textContent = (logBox.textContent + "\n" + resp.log.join("\n")).trim();
+            }
+            if (resp.status === 'finished') {
+                keepGoing = false;
+                statusText.textContent = resp.message || 'Zakończono.';
+                break;
+            }
+            await new Promise(r => setTimeout(r, 300));
+        }
     } catch(e) {
         statusText.textContent = e.message;
     }
