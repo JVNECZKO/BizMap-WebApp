@@ -101,12 +101,20 @@ const logBox = document.getElementById('migration-log');
 const statusText = document.getElementById('migration-status');
 
 async function post(url, body = {}) {
-    const res = await fetch(url, {
+    // próba POST, a jeśli 403, fallback do GET (WAF)
+    let res = await fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json','X-CSRF-TOKEN': '{{ csrf_token() }}'},
         credentials: 'same-origin',
         body: JSON.stringify(body),
     });
+    if (res.status === 403) {
+        res = await fetch(url, {
+            method: 'GET',
+            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+            credentials: 'same-origin',
+        });
+    }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
         throw new Error(data.error || ('HTTP ' + res.status));

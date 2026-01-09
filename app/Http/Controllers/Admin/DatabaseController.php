@@ -181,6 +181,7 @@ class DatabaseController extends Controller
      */
     public function migrationRun()
     {
+        @set_time_limit(0);
         $state = Setting::get('migration.state');
         if (! is_array($state) || ($state['status'] ?? null) !== 'running') {
             return response()->json(['error' => 'Brak aktywnej migracji. Rozpocznij od „Utwórz schemat i migruj dane”.'], 422);
