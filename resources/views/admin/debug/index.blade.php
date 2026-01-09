@@ -18,6 +18,12 @@
             <p class="text-sm text-slate-500">Po włączeniu, blok „SQL debug” pojawi się na dole każdej strony (HTML) w panelu oraz na froncie, ale tylko dla zalogowanego admina.</p>
 
             <div class="flex items-center gap-3">
+                <input type="checkbox" id="laravel_debug" name="laravel_debug" value="1" {{ $laravelDebug ? 'checked' : '' }} class="h-5 w-5 rounded border-slate-300">
+                <label for="laravel_debug" class="text-slate-800 font-semibold">Tryb debug Laravel (APP_DEBUG)</label>
+            </div>
+            <p class="text-sm text-slate-500">Przełącza APP_DEBUG bez edycji .env. Włącz tylko chwilowo, aby zobaczyć pełne komunikaty błędów na serwerze produkcyjnym.</p>
+
+            <div class="flex items-center gap-3">
                 <button type="submit" class="px-5 py-3 rounded-xl bg-slate-900 text-white shadow-panel hover:bg-slate-800">Zapisz ustawienie</button>
             </div>
         </form>

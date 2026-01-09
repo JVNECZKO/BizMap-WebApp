@@ -227,17 +227,26 @@
     });
 
     async function runChunk(mapping, staticValues) {
-        const res = await fetch(`/${adminPrefix}/importy/run`, {
-            method:'POST',
-            headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
-            body: JSON.stringify({
-                token: sessionToken,
-                mapping: mapping,
-                static_values: staticValues,
-                mapping_id: selectedTemplateId,
-            })
-        });
-        const data = await res.json();
+        let data = {};
+        try {
+            const res = await fetch(`/${adminPrefix}/importy/run`, {
+                method:'POST',
+                headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+                body: JSON.stringify({
+                    token: sessionToken,
+                    mapping: mapping,
+                    static_values: staticValues,
+                    mapping_id: selectedTemplateId,
+                })
+            });
+            data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || 'Błąd importu');
+            }
+        } catch (err) {
+            document.getElementById('progress-text').innerText = err.message || 'Błąd importu (szczegóły w logach).';
+            return;
+        }
         const imported = data.imported ?? 0;
         const processed = data.processed ?? 0;
         const total = data.total_rows ?? 0;

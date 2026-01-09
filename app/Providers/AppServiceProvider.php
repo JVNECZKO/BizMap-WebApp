@@ -46,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
             $adminPrefix = Setting::get('admin.prefix', config('bizmap.admin_prefix'));
             config(['bizmap.admin_prefix' => $adminPrefix]);
 
+            $appDebugSetting = Setting::get('debug.laravel', null);
+            if (! is_null($appDebugSetting)) {
+                config(['app.debug' => (bool) $appDebugSetting]);
+            }
+
             $driver = Setting::get('db.driver', config('database.default'));
             $connection = config("database.connections.$driver", config('database.connections.sqlite'));
 
