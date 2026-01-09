@@ -25,7 +25,7 @@
                 </div>
                 <div class="flex flex-wrap gap-4 text-sm text-sky-800">
                     @foreach($items as $item)
-                        <a class="hover:text-sky-900 font-semibold" href="#">
+                        <a class="hover:text-sky-900 font-semibold" href="{{ route('taxonomy.subgroup', [$item->group_slug, $item->subgroup_slug]) }}">
                             {{ $item->subgroup_name }}
                             <span class="text-slate-500 font-normal">({{ number_format($item->computed_count, 0, ',', ' ') }})</span>
                         </a>
