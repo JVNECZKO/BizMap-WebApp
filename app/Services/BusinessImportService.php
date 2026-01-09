@@ -136,6 +136,14 @@ class BusinessImportService
 
         DB::transaction(function () use ($batch, $pkdLinks, $rawPayloads, $pkdVersion) {
             $businessChunks = array_chunk($batch, $this->businessChunkSize());
+            $pkdBySlug = [];
+            foreach ($pkdLinks as $link) {
+                $pkdBySlug[$link['slug']][] = $link;
+            }
+            $rawBySlug = [];
+            foreach ($rawPayloads as $raw) {
+                $rawBySlug[$raw['slug']][] = $raw;
+            }
 
             foreach ($businessChunks as $chunk) {
                 Business::upsert(
@@ -184,17 +192,15 @@ class BusinessImportService
                     BusinessPkdCode::whereIn('business_id', $ids)->delete();
 
                     $pivotInsert = [];
-                    foreach ($pkdLinks as $link) {
-                        if (! isset($idBySlug[$link['slug']])) {
-                            continue;
+                    foreach ($idBySlug as $slug => $bizId) {
+                        foreach ($pkdBySlug[$slug] ?? [] as $link) {
+                            $pivotInsert[] = [
+                                'business_id' => $bizId,
+                                'pkd_code' => $link['pkd_code'],
+                                'pkd_version' => $pkdVersion,
+                                'created_at' => $link['created_at'],
+                            ];
                         }
-
-                        $pivotInsert[] = [
-                            'business_id' => $idBySlug[$link['slug']],
-                            'pkd_code' => $link['pkd_code'],
-                            'pkd_version' => $pkdVersion,
-                            'created_at' => $link['created_at'],
-                        ];
                     }
 
                     if (! empty($pivotInsert)) {
@@ -217,18 +223,16 @@ class BusinessImportService
 
                 if (! empty($rawPayloads) && ! empty($idBySlug)) {
                     $rawInsert = [];
-                    foreach ($rawPayloads as $raw) {
-                        if (! isset($idBySlug[$raw['slug']])) {
-                            continue;
+                    foreach ($idBySlug as $slug => $bizId) {
+                        foreach ($rawBySlug[$slug] ?? [] as $raw) {
+                            $rawInsert[] = [
+                                'business_id' => $bizId,
+                                'source' => $raw['source'],
+                                'payload' => $raw['payload'],
+                                'imported_at' => $raw['imported_at'],
+                                'created_at' => $raw['imported_at'],
+                            ];
                         }
-
-                        $rawInsert[] = [
-                            'business_id' => $idBySlug[$raw['slug']],
-                            'source' => $raw['source'],
-                            'payload' => $raw['payload'],
-                            'imported_at' => $raw['imported_at'],
-                            'created_at' => $raw['imported_at'],
-                        ];
                     }
 
                     if (! empty($rawInsert)) {
