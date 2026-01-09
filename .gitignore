@@ -21,6 +21,7 @@ yarn-error.log
 /database/*.db
 /database/*.sql
 /storage/app/pkd/*.json
+/storage/app/mapping/*
 
 # generated sitemaps
 /public/sitemap*.xml
