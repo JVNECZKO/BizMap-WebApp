@@ -83,7 +83,7 @@ class BusinessImportService
         $now = Carbon::now();
 
         $skip = $session->imported_rows;
-        $limit = $session->chunk_size;
+        $limit = min($session->chunk_size, $this->businessChunkSize());
 
         foreach ($this->rowGenerator($session->path, $session->format) as $index => $row) {
             if ($index < $skip) {
@@ -135,99 +135,107 @@ class BusinessImportService
         }
 
         DB::transaction(function () use ($batch, $pkdLinks, $rawPayloads, $pkdVersion) {
-            Business::upsert(
-                $batch,
-                ['slug'],
-                [
-                    'nip',
-                    'regon',
-                    'full_name',
-                    'slug',
-                    'nazwisko',
-                    'imie',
-                    'telefon',
-                    'email',
-                    'adres_www',
-                    'wojewodztwo',
-                    'powiat',
-                    'gmina',
-                    'miejscowosc',
-                    'ulica',
-                    'nr_budynku',
-                    'nr_lokalu',
-                    'kod_pocztowy',
-                    'glowny_kod_pkd',
-                    'pozostale_kody_pkd',
-                    'rok_pkd',
-                    'status_dzialalnosci',
-                    'data_rozpoczecia_dzialalnosci',
-                    'data_zakonczenia_dzialalnosci',
-                    'data_zawieszenia_dzialalnosci',
-                    'data_wznowienia_dzialalnosci',
-                    'imported_at',
-                    'updated_at',
-                ]
-            );
+            $businessChunks = array_chunk($batch, $this->businessChunkSize());
 
-            $slugs = array_column($batch, 'slug');
-            $businesses = Business::query()
-                ->whereIn('slug', $slugs)
-                ->get(['id', 'slug']);
+            foreach ($businessChunks as $chunk) {
+                Business::upsert(
+                    $chunk,
+                    ['slug'],
+                    [
+                        'nip',
+                        'regon',
+                        'full_name',
+                        'slug',
+                        'nazwisko',
+                        'imie',
+                        'telefon',
+                        'email',
+                        'adres_www',
+                        'wojewodztwo',
+                        'powiat',
+                        'gmina',
+                        'miejscowosc',
+                        'ulica',
+                        'nr_budynku',
+                        'nr_lokalu',
+                        'kod_pocztowy',
+                        'glowny_kod_pkd',
+                        'pozostale_kody_pkd',
+                        'rok_pkd',
+                        'status_dzialalnosci',
+                        'data_rozpoczecia_dzialalnosci',
+                        'data_zakonczenia_dzialalnosci',
+                        'data_zawieszenia_dzialalnosci',
+                        'data_wznowienia_dzialalnosci',
+                        'imported_at',
+                        'updated_at',
+                    ]
+                );
 
-            $idBySlug = $businesses->pluck('id', 'slug');
-            $ids = $businesses->pluck('id')->all();
+                $slugsChunk = array_column($chunk, 'slug');
+                $businesses = Business::query()
+                    ->whereIn('slug', $slugsChunk)
+                    ->get(['id', 'slug']);
 
-            if (! empty($pkdLinks) && ! empty($ids)) {
-                BusinessPkdCode::whereIn('business_id', $ids)->delete();
+                $idBySlug = $businesses->pluck('id', 'slug');
+                $ids = $businesses->pluck('id')->all();
 
-                $pivotInsert = [];
-                foreach ($pkdLinks as $link) {
-                    if (! isset($idBySlug[$link['slug']])) {
-                        continue;
+                if (! empty($pkdLinks) && ! empty($ids)) {
+                    BusinessPkdCode::whereIn('business_id', $ids)->delete();
+
+                    $pivotInsert = [];
+                    foreach ($pkdLinks as $link) {
+                        if (! isset($idBySlug[$link['slug']])) {
+                            continue;
+                        }
+
+                        $pivotInsert[] = [
+                            'business_id' => $idBySlug[$link['slug']],
+                            'pkd_code' => $link['pkd_code'],
+                            'pkd_version' => $pkdVersion,
+                            'created_at' => $link['created_at'],
+                        ];
                     }
 
-                    $pivotInsert[] = [
-                        'business_id' => $idBySlug[$link['slug']],
-                        'pkd_code' => $link['pkd_code'],
-                        'pkd_version' => $pkdVersion,
-                        'created_at' => $link['created_at'],
-                    ];
-                }
-
-                if (! empty($pivotInsert)) {
-                    BusinessPkdCode::insertOrIgnore($pivotInsert);
-                }
-
-                $aggregated = [];
-                foreach ($pivotInsert as $pivot) {
-                    $aggregated[$pivot['pkd_code']] = ($aggregated[$pivot['pkd_code']] ?? 0) + 1;
-                }
-                foreach ($aggregated as $code => $count) {
-                    DB::table('pkd_popularity')->updateOrInsert(
-                        ['pkd_code' => $code],
-                        ['total' => DB::raw('COALESCE(total,0)+' . (int) $count), 'updated_at' => now(), 'created_at' => now()]
-                    );
-                }
-            }
-
-            if (! empty($rawPayloads) && ! empty($idBySlug)) {
-                $rawInsert = [];
-                foreach ($rawPayloads as $raw) {
-                    if (! isset($idBySlug[$raw['slug']])) {
-                        continue;
+                    if (! empty($pivotInsert)) {
+                        foreach (array_chunk($pivotInsert, $this->pivotChunkSize()) as $chunkPivot) {
+                            BusinessPkdCode::insertOrIgnore($chunkPivot);
+                        }
                     }
 
-                    $rawInsert[] = [
-                        'business_id' => $idBySlug[$raw['slug']],
-                        'source' => $raw['source'],
-                        'payload' => $raw['payload'],
-                        'imported_at' => $raw['imported_at'],
-                        'created_at' => $raw['imported_at'],
-                    ];
+                    $aggregated = [];
+                    foreach ($pivotInsert as $pivot) {
+                        $aggregated[$pivot['pkd_code']] = ($aggregated[$pivot['pkd_code']] ?? 0) + 1;
+                    }
+                    foreach ($aggregated as $code => $count) {
+                        DB::table('pkd_popularity')->updateOrInsert(
+                            ['pkd_code' => $code],
+                            ['total' => DB::raw('COALESCE(total,0)+' . (int) $count), 'updated_at' => now(), 'created_at' => now()]
+                        );
+                    }
                 }
 
-                if (! empty($rawInsert)) {
-                    BusinessRawPayload::insert($rawInsert);
+                if (! empty($rawPayloads) && ! empty($idBySlug)) {
+                    $rawInsert = [];
+                    foreach ($rawPayloads as $raw) {
+                        if (! isset($idBySlug[$raw['slug']])) {
+                            continue;
+                        }
+
+                        $rawInsert[] = [
+                            'business_id' => $idBySlug[$raw['slug']],
+                            'source' => $raw['source'],
+                            'payload' => $raw['payload'],
+                            'imported_at' => $raw['imported_at'],
+                            'created_at' => $raw['imported_at'],
+                        ];
+                    }
+
+                    if (! empty($rawInsert)) {
+                        foreach (array_chunk($rawInsert, $this->pivotChunkSize()) as $chunkRaw) {
+                            BusinessRawPayload::insert($chunkRaw);
+                        }
+                    }
                 }
             }
         });
@@ -317,6 +325,22 @@ class BusinessImportService
             'business' => $data,
             'pkd_codes' => $pkdCodes,
         ];
+    }
+
+    protected function sqlite(): bool
+    {
+        return DB::getDriverName() === 'sqlite';
+    }
+
+    protected function businessChunkSize(): int
+    {
+        return $this->sqlite() ? 30 : config('bizmap.import.chunk', 500);
+    }
+
+    protected function pivotChunkSize(): int
+    {
+        // 4 kolumny na wstawienie => 200 rekordów ~800 parametrów (poniżej limitu 999 SQLite)
+        return $this->sqlite() ? 200 : 1000;
     }
 
     protected function normalizeMapping(array $mapping): array
