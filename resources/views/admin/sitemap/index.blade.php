@@ -34,7 +34,7 @@
     const statusEl = document.getElementById('sitemap-status');
     const btn = document.getElementById('start-sitemap');
     let running = false;
-    let stepsPerCall = 10;
+    let stepsPerCall = 5;
 
     btn.addEventListener('click', async () => {
         if (running) return;
@@ -86,8 +86,9 @@
         }
         const data = await res.json();
         if (data.status === 'running') {
-            statusEl.innerText = `Przetwarzanie... plik: ${data.file} (łącznie ${data.files_count}), zapisanych rekordów: ${data.processed}`;
-            setTimeout(runChunk, 400);
+            const phase = data.phase || 'companies';
+            statusEl.innerText = `Faza: ${phase}. Ostatni plik: ${data.file} (łącznie ${data.files_count}). Zapisanych rekordów: ${data.processed}.`;
+            setTimeout(runChunk, 500);
         } else if (data.status === 'finished') {
             statusEl.innerText = `Zakończono generowanie sitemap. Przetworzono ${data.total_processed} rekordów.`;
             running = false;

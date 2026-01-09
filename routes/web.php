@@ -30,6 +30,7 @@ Route::post('/ab/fail', function () {
         ->cookie(Cookie::forget('ab_ok'));
 })->name('ab.fail');
 Route::get('/firma/{id}-{slug}', [CompanyController::class, 'show'])->name('company.show');
+Route::get('/pkd/{code}/{slug}/{region?}', [\App\Http\Controllers\SeoController::class, 'pkdLanding'])->name('seo.pkd');
 Route::get('/pkd', [\App\Http\Controllers\PageController::class, 'pkd'])->name('pkd.index');
 Route::get('/o-nas', [\App\Http\Controllers\PageController::class, 'about'])->name('about');
 Route::get('/kontakt', [\App\Http\Controllers\PageController::class, 'contact'])->name('contact');
