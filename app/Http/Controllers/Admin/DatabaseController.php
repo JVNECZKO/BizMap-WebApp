@@ -166,7 +166,13 @@ class DatabaseController extends Controller
         ];
 
         foreach ($tables as $table => $orderBy) {
-            $this->copyTable($table, $orderBy, $log);
+            try {
+                $this->copyTable($table, $orderBy, $log);
+            } catch (\Throwable $e) {
+                $this->logStep($log, "❌ Błąd kopiowania {$table}: " . $e->getMessage());
+                \Log::error('Migration copy table failed', ['table' => $table, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+                return response()->json(['error' => "Migracja przerwana na tabeli {$table}: " . $e->getMessage(), 'log' => $log], 500);
+            }
         }
 
         $this->logStep($log, 'Migracja danych zakończona. Możesz teraz bezpiecznie przełączyć bazę danych.');
