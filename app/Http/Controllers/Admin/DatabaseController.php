@@ -168,7 +168,7 @@ class DatabaseController extends Controller
             'status' => 'running',
             'table_index' => 0,
             'offset' => 0,
-            'chunk' => 500,
+            'chunk' => 5000,
         ];
         Setting::setValue('migration.state', $state, 'json');
         $this->logStep($log, 'Schemat gotowy. Start migracji krokowej.');
@@ -204,7 +204,7 @@ class DatabaseController extends Controller
         $tables = $this->migrationTables();
         $index = $state['table_index'] ?? 0;
         $offset = $state['offset'] ?? 0;
-        $chunk = $state['chunk'] ?? 500;
+        $chunk = $state['chunk'] ?? 5000;
         $log = [];
 
         if ($index >= count($tables)) {
