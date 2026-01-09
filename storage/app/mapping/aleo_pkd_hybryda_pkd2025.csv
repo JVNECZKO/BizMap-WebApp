@@ -1,0 +1,176 @@
+aleo_grupa,aleo_podgrupa,pkd_primary,pkd_secondary
+Artykuły dla biur i wyposażenie biurowe,Materiały i akcesoria biurowe,46.13.Z,46.83.Z|47.52.Z|46.49.Z|46.43.Z|46.15.Z
+Artykuły dla biur i wyposażenie biurowe,Sprzęt biurowy,46.49.Z,47.75.Z|46.43.Z|46.15.Z|47.79.C|47.62.Z
+"BHP, PPOŻ i środki czystości",Odzież i obuwie robocze i ochronne,14.21.Z,14.23.Z|14.24.Z|46.42.Z|14.10.Z|46.85.B
+"Budownictwo, usługi i materiały budowlane",Budowanie instalacji,41.00.B,41.00.A|43.50.Z|43.21.Z|43.99.Z|43.24.Z
+"Budownictwo, usługi i materiały budowlane",Konstrukcje metalowe,43.50.Z,41.00.A|41.00.B|43.99.Z|43.35.Z|43.41.Z
+"Budownictwo, usługi i materiały budowlane",Materiały budowlane,41.00.A,41.00.B|43.50.Z|43.99.Z|43.60.Z|42.91.Z
+"Budownictwo, usługi i materiały budowlane",Usługi budowlano-remontowe,41.00.B,41.00.A|43.50.Z|43.99.Z|43.42.Z|42.13.Z
+Chemia,Chemia gospodarcza,20.60.Z,20.14.Z|20.13.Z|47.54.Z|46.45.Z|46.31.Z
+Chemia,Chemia kosmetyczna,46.45.Z,20.42.Z|20.60.Z|20.14.Z|20.20.A|47.71.Z
+Chemia,Chemia przemysłowa,46.12.Z,46.14.Z|46.11.B|20.60.Z|20.20.A|47.12.Z
+Chemia,Wyroby chemiczne,20.60.Z,46.85.B|47.22.Z|20.20.C|20.42.Z|46.36.Z
+Chemia,Inne,20.60.Z,46.85.A|20.13.Z|46.22.Z|47.71.Z|47.22.Z
+Dom i ogród,Ogród,46.82.Z,46.85.A|47.26.Z|32.11.Z|47.72.Z|32.30.Z
+Dom i ogród,Wyposażenie domu,43.34.Z,46.61.Z|43.11.Z|43.33.Z|46.71.Z|46.72.Z
+Dom i ogród,Inne,32.11.Z,46.82.Z|47.71.Z|46.22.Z|46.21.A|47.22.Z
+"Edukacja, sport i rozrywka",Badania naukowe,85.59.C,85.10.Z|93.19.Z|91.41.A|93.21.Z|85.61.Z
+"Edukacja, sport i rozrywka",Edukacja,85.52.Z,93.21.Z|93.19.Z|96.23.Z|93.12.Z|79.12.Z
+"Edukacja, sport i rozrywka",Kultura i sztuka,90.31.B,90.12.Z|79.12.Z|91.21.B|93.21.Z|85.32.B
+"Edukacja, sport i rozrywka",Rozrywka i rekreacja,85.51.Z,93.29.B|96.30.Z|93.21.Z|90.31.B|90.12.Z
+"Edukacja, sport i rozrywka",Sport i turystyka,85.51.Z,79.12.Z|96.30.Z|93.21.Z|79.11.Z|90.31.B
+"Edukacja, sport i rozrywka",Inne,93.21.Z,79.12.Z|85.51.Z|93.19.Z|85.52.Z|96.23.Z
+"Energia, paliwa, media",Ciepłownictwo,35.15.Z,35.23.Z|35.22.Z|35.12.B|49.50.A|49.33.Z
+"Energia, paliwa, media",Energia elektryczna,35.15.Z,35.16.Z|35.13.Z|35.14.Z|35.40.Z|35.12.B
+"Energia, paliwa, media",Gazy techniczne,35.15.Z,35.23.Z|49.50.A|35.21.Z|35.22.Z|35.12.B
+"Energia, paliwa, media",Gaz ziemny,35.15.Z,06.20.Z|35.23.Z|47.30.Z|49.50.A|35.12.D
+"Energia, paliwa, media",Opał,35.15.Z,35.12.B|35.12.D|35.12.C|35.12.A|35.23.Z
+"Energia, paliwa, media",Paliwa,35.15.Z,47.30.Z|35.12.D|35.23.Z|35.12.C|35.22.Z
+"Energia, paliwa, media",Woda,35.15.Z,35.12.E|35.12.A|35.12.D|35.12.C|47.22.Z
+IT i telekomunikacja,Doradztwo techniczne,61.10.B,95.32.Z|61.90.A|61.90.B|95.25.Z|63.10.A
+IT i telekomunikacja,"Sprzęt IT, urządzenia peryferyjne",61.90.B,95.24.Z|61.10.B|46.84.Z|61.90.A|95.21.Z
+IT i telekomunikacja,Telekomunikacja,,61.20.Z
+IT i telekomunikacja,Usługi IT,,
+"Logistyka, spedycja, transport",Logistyka i magazynowanie,,
+"Logistyka, spedycja, transport",Przewóz osób,49.12.Z,52.22.B|52.22.A|49.31.Z|49.41.Z|52.21.B
+"Logistyka, spedycja, transport",Transport i spedycja drogowa,50.20.Z,49.12.Z|49.39.Z|52.22.B|49.41.Z|52.21.B
+"Logistyka, spedycja, transport",Transport i spedycja kolejowa,50.20.Z,49.50.B|49.12.Z|49.20.Z|49.39.Z|52.22.B
+"Logistyka, spedycja, transport",Transport i spedycja lotnicza,52.23.Z,49.12.Z|51.21.Z|50.20.Z|51.10.Z|49.50.B
+"Logistyka, spedycja, transport",Transport i spedycja wodna,49.12.Z,50.20.Z|49.50.B|52.23.Z|52.22.A|52.22.B
+"Logistyka, spedycja, transport",Transport rurociągowy,49.50.A,49.50.B|49.12.Z|52.22.B|52.21.B|52.23.Z
+"Logistyka, spedycja, transport",Usługi kurierskie,53.20.Z,49.41.Z
+"Logistyka, spedycja, transport",Usługi pocztowe,53.10.Z,53.20.Z
+"Logistyka, spedycja, transport",Inne,49.12.Z,51.22.Z|52.22.A|52.23.Z|52.26.Z|52.21.B
+"Marketing, reklama i PR",Agencje reklamowe,73.11.Z,73.12.Z
+"Marketing, reklama i PR",Produkcja reklamy,73.12.Z,73.20.Z|73.11.Z|82.91.Z|73.30.B|74.13.Z
+"Marketing, reklama i PR",Usługi marketingowe,73.12.Z,74.91.Z|82.91.Z|70.10.B|73.11.Z|73.20.Z
+"Marketing, reklama i PR",Usługi PR,,73.11.Z
+"Marketing, reklama i PR",Zakup powierzchni reklamowej,73.12.Z,73.11.Z
+Maszyny i utrzymanie ciągłości produkcji,Akumulatory i baterie,28.93.Z,01.27.Z|08.91.Z|01.28.Z|27.20.Z|43.41.Z
+Maszyny i utrzymanie ciągłości produkcji,Automatyka przemysłowa,08.91.Z,28.93.Z|01.27.Z|28.95.Z|28.94.Z|81.22.B
+Maszyny i utrzymanie ciągłości produkcji,Elementy złączne,28.93.Z,01.27.Z|08.91.Z|01.28.Z|02.30.Z|35.16.Z
+Maszyny i utrzymanie ciągłości produkcji,Instrumenty pomiarowe i nawigacyjne,28.93.Z,01.27.Z|01.28.Z|08.91.Z|26.51.Z|32.20.Z
+Maszyny i utrzymanie ciągłości produkcji,Komponenty elektryczne i elektroniczne,28.93.Z,01.27.Z|01.28.Z|08.91.Z|29.31.Z|26.60.Z
+Maszyny i utrzymanie ciągłości produkcji,Maszyny i części do maszyn,28.93.Z,77.32.Z|28.91.Z|46.64.Z|28.30.Z|77.33.Z
+Maszyny i utrzymanie ciągłości produkcji,Materiały ścierne,28.93.Z,01.27.Z|08.91.Z|01.28.Z|23.32.Z|15.12.Z
+Maszyny i utrzymanie ciągłości produkcji,Narzędzia i elektronarzędzia,28.93.Z,08.91.Z|01.27.Z|01.28.Z|10.61.Z|13.10.Z
+Maszyny i utrzymanie ciągłości produkcji,"Ogrzewanie, klimatyzacja i wentylacja",28.93.Z,01.28.Z|08.91.Z|01.27.Z|43.22.Z|28.25.Z
+Maszyny i utrzymanie ciągłości produkcji,"Serwis maszyn, urządzeń i części zamiennych",77.31.Z,77.32.Z|77.33.Z|46.64.Z|77.39.Z|46.14.Z
+Maszyny i utrzymanie ciągłości produkcji,Utrzymanie ciągłości produkcji,28.93.Z,01.27.Z|08.91.Z|01.28.Z|52.10.B|19.10.Z
+Meble,Meble biurowe i sklepowe,46.45.Z,46.47.Z|46.24.Z|46.42.Z|46.22.Z|46.87.Z
+Meble,Meble kuchenne,31.00.Z,46.83.Z|46.33.Z|47.74.Z|47.72.Z|47.69.A
+Meble,Inne,31.00.Z,47.64.Z|46.82.Z|47.69.B|47.77.Z|46.83.Z
+"Medycyna, farmacja i kosmetyki",Kosmetyki,20.42.Z,46.45.Z|47.75.Z
+"Medycyna, farmacja i kosmetyki",Leki i produkty lecznicze,21.20.Z,46.46.Z
+"Medycyna, farmacja i kosmetyki","Urządzenia, sprzęt medyczny i serwis",87.20.Z,20.42.Z|47.63.Z|46.84.Z|46.45.Z|46.46.Z
+"Medycyna, farmacja i kosmetyki",Usługi medyczne,86.21.Z,86.22.Z
+"Medycyna, farmacja i kosmetyki",Wyroby i artykuły medyczne,47.75.Z,47.62.Z|47.79.C|47.55.Z|46.43.Z|46.49.Z
+Nieruchomości i usługi powiązane,Administrowanie nieruchomościami,68.31.Z,68.32.A|68.32.B|68.20.Z|68.32.C|68.11.Z
+Nieruchomości i usługi powiązane,Inne usługi utrzymania nieruchomości,68.32.A,68.11.Z|68.32.C|81.10.Z|68.32.B|81.30.Z
+Nieruchomości i usługi powiązane,Pośrednictwo,68.31.Z,
+Nieruchomości i usługi powiązane,Usługi najmu i zarządzania nieruchomości,68.32.A,68.32.C|68.11.Z|68.32.B|68.20.Z|81.30.Z
+Nieruchomości i usługi powiązane,Usługi ochrony,,
+Nieruchomości i usługi powiązane,Usługi sprzątania,81.21.Z,
+Nieruchomości i usługi powiązane,"Zakup, sprzedaż i wycena nieruchomości",68.32.A,68.11.Z|68.32.C|81.30.Z|68.32.B|81.23.A
+Odpady i surowce wtórne,Obróbka i usuwanie,46.85.B,38.21.Z|38.31.Z|46.41.Z|46.35.Z|46.21.A
+Odpady i surowce wtórne,Odpady komunalne,46.87.Z,38.32.Z|38.21.Z|38.31.Z|46.41.Z|46.35.Z
+Odpady i surowce wtórne,Recycling,38.21.Z,46.90.Z|46.35.Z|38.31.Z|46.62.Z|38.12.Z
+Odpady i surowce wtórne,Surowce wtórne,38.21.Z,46.35.Z|46.85.B|38.31.Z|46.41.Z|46.49.Z
+Odpady i surowce wtórne,Zbieranie odpadów,38.12.Z,38.11.Z|38.32.Z|38.33.Z|46.87.Z|38.31.Z
+Odpady i surowce wtórne,Inne,38.21.Z,46.35.Z|38.31.Z|38.22.Z|46.89.Z|46.36.Z
+"Opakowania, etykiety, folie, taśmy",Opakowania drewniane,16.24.Z,16.27.Z|25.92.Z|17.21.Z|16.25.Z|46.81.Z
+"Opakowania, etykiety, folie, taśmy",Opakowania kartonowe i tektura,17.21.Z,25.92.Z|46.37.Z|46.64.Z|17.12.Z|46.73.Z
+"Opakowania, etykiety, folie, taśmy",Opakowania metalowe,25.92.Z,25.51.Z|17.21.Z|25.53.Z|25.52.Z|46.81.Z
+"Opakowania, etykiety, folie, taśmy",Opakowania plastikowe,25.92.Z,17.21.Z|25.40.Z|46.37.Z|46.81.Z|16.27.Z
+"Opakowania, etykiety, folie, taśmy",Usługi konfekcjonowania i pakowania,25.40.Z,46.73.Z|46.21.B|46.37.Z|46.39.Z|16.21.Z
+Pojazdy i środki transportu,Części i materiały eksploatacyjne pojazdów,29.32.Z,46.72.Z|47.82.Z|47.83.Z|46.73.Z|46.13.Z
+Pojazdy i środki transportu,Motocykle i quady,95.32.Z,30.91.Z|46.73.Z|47.83.Z|47.63.Z|33.17.Z
+Pojazdy i środki transportu,Opony i felgi,47.63.Z,33.17.Z|46.85.A|47.62.Z|95.21.Z|33.19.Z
+Pojazdy i środki transportu,Pojazdy specjalistyczne,30.40.Z,47.30.Z|46.90.Z|33.12.Z|33.14.Z|95.21.Z
+Pojazdy i środki transportu,Rowery,47.63.Z,33.17.Z|47.62.Z|95.21.Z|30.12.Z|47.75.Z
+Pojazdy i środki transportu,Samochody osobowe i ciężarowe,29.10.B,95.29.Z|47.63.Z|30.99.Z|33.17.Z|46.85.A
+Pojazdy i środki transportu,Serwis i utrzymanie pojazdów,30.40.Z,95.31.A|29.31.Z|29.10.A|29.10.E|47.30.Z
+Pozostałe,Gospodarstwa domowe,46.85.B,47.54.Z|46.49.Z|10.39.Z|46.86.Z|47.12.Z
+Pozostałe,Organizacje i związki,10.39.Z,94.99.Z|46.64.Z|46.38.Z|96.99.Z|47.27.Z
+Pozostałe,Pomoc społeczna,46.85.B,47.12.Z|10.39.Z|46.86.Z|46.38.Z|47.27.Z
+Pozostałe,Portale internetowe,10.39.Z,46.89.Z|96.99.Z|47.12.Z|46.86.Z|11.04.Z
+Pozostałe,Produkcja,46.86.Z,47.12.Z|46.38.Z|47.27.Z|10.39.Z|46.85.B
+Pozostałe,Sklepy internetowe,46.85.B,10.39.Z|47.12.Z|11.04.Z|46.64.Z|96.99.Z
+Pozostałe,Sprzedaż detaliczna,47.12.Z,47.27.Z|47.78.Z|47.79.C|47.62.Z|47.69.C
+Pozostałe,Sprzedaż hurtowa,46.85.B,46.38.Z|46.89.Z|46.86.Z|46.64.Z|46.18.Z
+Pozostałe,Wyroby tytoniowe,46.85.B,10.39.Z|47.78.Z|46.49.Z|46.38.Z|46.86.Z
+Pozostałe,Inne,47.12.Z,46.38.Z|47.27.Z|10.39.Z|46.85.B|96.99.Z
+Przemysł spożywczy,Alkoholowy,46.14.Z,46.12.Z|46.11.B|46.34.A|46.34.B|47.25.Z
+Przemysł spożywczy,Cukrowniczy,46.11.B,46.12.Z|46.14.Z|10.82.Z|46.36.Z|46.73.Z
+Przemysł spożywczy,Kawa i herbata,46.14.Z,46.12.Z|46.11.B|46.23.Z|10.83.Z|46.42.Z
+Przemysł spożywczy,Mięsny,46.14.Z,46.12.Z|46.11.B|46.23.Z|46.64.Z|10.89.B
+Przemysł spożywczy,Mleczarski,46.14.Z,46.12.Z|46.11.B|10.51.Z|46.23.Z|47.23.Z
+Przemysł spożywczy,Napoje bezalkoholowe,46.14.Z,46.34.B|46.11.B|46.34.A|46.12.Z|47.25.Z
+Przemysł spożywczy,Oleje i tłuszcze,46.14.Z,46.12.Z|46.11.B|46.64.Z|10.41.Z|46.33.Z
+Przemysł spożywczy,Owocowo-warzywny,46.14.Z,46.12.Z|46.11.B|46.31.Z|47.21.Z|10.32.Z
+Przemysł spożywczy,Piekarniczy,46.14.Z,46.12.Z|46.11.B|46.23.Z|46.36.Z|10.83.Z
+Przemysł spożywczy,Produkcja lodów,10.52.Z,46.14.Z|46.11.B|46.12.Z|46.86.Z|11.06.Z
+Przemysł spożywczy,Przyprawy,46.12.Z,46.11.B|46.14.Z|10.84.Z|46.23.Z|46.37.Z
+Przemysł spożywczy,Rybny,46.14.Z,46.12.Z|46.11.B|46.23.Z|46.64.Z|47.78.Z
+Przemysł spożywczy,Słodycze i przekąski,46.14.Z,46.12.Z|46.11.B|46.23.Z|46.64.Z|46.37.Z
+Przemysł spożywczy,Tytoń,46.14.Z,46.12.Z|46.11.B|47.26.Z|46.35.Z|47.79.B
+Przemysł spożywczy,Zbożowo-młynarski,46.14.Z,46.11.B|46.12.Z|46.21.A|46.23.Z|10.86.Z
+Przemysł spożywczy,Inne,46.14.Z,46.12.Z|46.11.B|46.23.Z|46.64.Z|46.38.Z
+"Rolnictwo, hodowla i uprawa",Chów i hodowla zwierząt,01.48.Z,01.44.Z|01.43.Z|01.62.Z|01.45.Z|01.50.Z
+"Rolnictwo, hodowla i uprawa",Kwiaty i rośliny,01.45.Z,01.48.Z|01.46.Z|01.42.Z|01.47.Z|01.43.Z
+"Rolnictwo, hodowla i uprawa",Leśnictwo i sadownictwo,01.45.Z,01.41.Z|01.42.Z|01.43.Z|01.50.Z|01.46.Z
+"Rolnictwo, hodowla i uprawa",Nawozy i środki ochrony roślin,01.29.Z,01.13.Z|01.11.Z|01.16.Z|01.28.Z|01.27.Z
+"Rolnictwo, hodowla i uprawa",Płody rolne,01.50.Z,01.41.Z|01.47.Z|01.46.Z|01.48.Z|01.45.Z
+"Rolnictwo, hodowla i uprawa",Rybołówstwo,03.30.Z,03.11.Z|03.12.Z|01.42.Z|01.41.Z|01.47.Z
+"Rolnictwo, hodowla i uprawa",Inne,01.46.Z,01.41.Z|01.47.Z|01.48.Z|01.45.Z|01.21.Z
+RTV i AGD,AGD,46.82.Z,27.20.Z|47.64.Z|26.20.Z|95.32.Z|27.31.Z
+RTV i AGD,RTV i fotografia,95.32.Z,95.23.Z|95.24.Z|95.25.Z|47.75.Z|27.20.Z
+RTV i AGD,Serwis sprzętu RTV i AGD,95.10.Z,26.30.Z|47.63.Z|27.33.Z|27.40.Z|27.90.Z
+Surowce i półprodukty,Drewno,24.34.Z,20.20.A|16.24.Z|16.25.Z|23.13.Z|22.11.Z
+Surowce i półprodukty,Dzianiny,24.44.Z,25.63.Z|17.23.Z|24.41.Z|24.54.A|16.24.Z
+Surowce i półprodukty,Górnictwo,09.90.Z,07.10.Z|06.10.Z|06.20.Z|07.21.Z|08.99.Z
+Surowce i półprodukty,Guma,24.34.Z,17.24.Z|22.12.Z|24.44.Z|23.51.Z|23.64.Z
+Surowce i półprodukty,Kauczuk,17.23.Z,25.63.Z|24.54.A|22.25.Z|23.13.Z|16.12.Z
+Surowce i półprodukty,Kruszywa,20.20.A,24.34.Z|23.14.Z|17.23.Z|25.94.Z|24.54.A
+Surowce i półprodukty,Metale,25.51.Z,24.41.Z|23.51.Z|25.52.Z|24.45.Z|17.24.Z
+Surowce i półprodukty,Odlewnictwo,24.51.Z,24.52.Z|24.53.Z|24.54.A|24.54.B|16.24.Z
+Surowce i półprodukty,Przędza,25.63.Z,07.10.Z|24.44.Z|24.54.A|17.24.Z|16.25.Z
+Surowce i półprodukty,Szkło,23.12.Z,23.11.Z|23.13.Z|23.15.Z|24.54.A|25.40.Z
+Surowce i półprodukty,Tektura i produkty celulozowe,25.12.Z,25.22.Z|23.13.Z|23.63.Z|16.22.Z|20.16.Z
+Surowce i półprodukty,Tkaniny i skóry,17.12.Z,25.94.Z|23.52.Z|24.31.Z|08.12.Z|20.12.Z
+Surowce i półprodukty,Tworzywa sztuczne,22.22.Z,22.25.Z|22.26.Z|22.23.Z|22.24.Z|20.16.Z
+Surowce i półprodukty,Inne,24.44.Z,24.54.A|24.42.A|17.11.Z|17.24.Z|23.91.Z
+"Ubrania, obuwie, galanteria, biżuteria",Biżuteria i zegarki,47.77.Z,46.48.Z|46.83.Z|47.52.Z|32.13.Z|14.24.Z
+"Ubrania, obuwie, galanteria, biżuteria",Obuwie,47.77.Z,46.48.Z|32.13.Z|15.11.Z|47.52.Z|46.83.Z
+"Ubrania, obuwie, galanteria, biżuteria",Skóry,47.77.Z,46.48.Z|47.72.Z|46.83.Z|32.13.Z|47.52.Z
+"Ubrania, obuwie, galanteria, biżuteria",Torby i walizki,47.77.Z,47.52.Z|46.48.Z|46.83.Z|32.13.Z|15.11.Z
+"Ubrania, obuwie, galanteria, biżuteria",Ubrania,47.77.Z,46.48.Z|46.83.Z|47.52.Z|32.13.Z|14.24.Z
+"Ubrania, obuwie, galanteria, biżuteria",Wyroby tekstylne,47.51.Z,13.30.Z|46.41.Z|32.13.Z|47.77.Z|46.48.Z
+"Ubrania, obuwie, galanteria, biżuteria",Inne,47.77.Z,46.48.Z|46.83.Z|32.13.Z|47.52.Z|14.24.Z
+Usługi dla firm,Agencje celne,82.91.Z,73.11.Z|86.99.A|77.31.Z|81.30.Z|85.33.A
+Usługi dla firm,Archiwizacja i niszczenie dokumentów,,38.32.Z
+Usługi dla firm,Badania i analizy techniczne,71.20.C,71.20.A|72.10.Z|71.12.B|72.20.Z|85.52.Z
+Usługi dla firm,Doradztwo techniczne,71.12.B,71.20.C|69.20.B|70.20.Z|77.35.Z|69.10.Z
+Usługi dla firm,Drukowanie i poligrafia,18.12.Z,18.13.Z|18.14.Z
+Usługi dla firm,Inne usługi dla firm,96.99.Z,77.33.Z|71.12.B|70.10.B|81.23.B|80.09.Z
+Usługi dla firm,Introligatorstwo,18.14.Z,18.13.Z
+Usługi dla firm,Konwojowanie i inkaso,90.11.Z,77.12.Z|90.20.A|95.24.Z|96.99.Z|95.10.Z
+Usługi dla firm,Organizacja podróży służbowych,82.30.Z,94.92.Z|94.12.Z|94.91.Z|79.12.Z|94.11.Z
+Usługi dla firm,Restauracje i catering,,56.21.Z
+Usługi dla firm,Tłumaczenia,74.30.Z,
+Usługi dla firm,Usługi finansowe i doradcze,,64.19.Z|66.19.Z
+Usługi dla firm,"Usługi fotograficzne, audio i wideo",74.20.Z,74.12.Z|77.21.Z|96.91.Z|85.53.Z|77.35.Z
+Usługi dla firm,Usługi hotelarskie,55.10.Z,55.20.Z|55.30.Z|55.90.Z
+Usługi dla firm,Usługi HR i kadrowo-płacowe,,78.10.Z|78.20.Z
+Usługi dla firm,Usługi pralnicze i czyszczenia,95.31.C,96.91.Z|96.10.Z|74.30.Z|69.10.Z|79.90.Z
+Usługi dla firm,Usługi profesjonalne - naukowe i techniczne,71.20.C,71.12.B|72.10.Z|72.20.Z|74.99.Z|79.90.Z
+Usługi dla firm,Usługi weterynaryjne,75.00.Z,86.99.A|70.10.B|81.30.Z|96.99.Z|86.99.B
+Administracja publiczna,Kierowanie podstawowymi działalnościami publicznymi,84.11.Z,84.12.Z|84.13.Z|84.24.Z|84.23.Z|84.25.Z
+Administracja publiczna,"Kierowanie w zakresie ochrony zdrowia, edukacji i kultury",84.12.Z,84.13.Z|84.11.Z|84.25.Z|84.24.Z|84.21.Z
+Administracja publiczna,Efektywność gospodarowania,84.13.Z,84.25.Z|84.11.Z|84.23.Z|84.22.Z|84.24.Z
+Administracja publiczna,Sprawy zagraniczne,84.21.Z,84.11.Z|84.23.Z|84.30.Z|84.24.Z|84.25.Z
+Administracja publiczna,Obrona narodowa,84.22.Z,84.25.Z|84.11.Z|84.13.Z|84.24.Z|84.21.Z
+Administracja publiczna,Bezpieczeństwo publiczne,84.24.Z,84.30.Z|84.11.Z|84.21.Z|84.23.Z|84.25.Z
+Administracja publiczna,Ochrona przeciwpożarowa,84.25.Z,
+Administracja publiczna,Obowiązkowe zabezpieczenia społeczne,84.30.Z,84.12.Z|84.24.Z|84.11.Z|84.13.Z|84.25.Z
+Inne,Inne,64.91.Z,43.34.Z|58.11.Z|02.20.Z|35.12.B|55.30.Z
