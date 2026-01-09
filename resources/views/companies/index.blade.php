@@ -86,6 +86,14 @@
             <label class="text-xs uppercase tracking-[0.2em] text-slate-500">Kod pocztowy</label>
             <input type="text" name="kod_pocztowy" value="{{ $filters['kod_pocztowy'] ?? '' }}" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3" placeholder="00-001" />
         </div>
+        <div>
+            <label class="text-xs uppercase tracking-[0.2em] text-slate-500">Data rozpoczęcia od</label>
+            <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+        </div>
+        <div>
+            <label class="text-xs uppercase tracking-[0.2em] text-slate-500">Data rozpoczęcia do</label>
+            <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+        </div>
         <div class="flex items-end gap-3">
             <button class="px-6 py-3 rounded-xl bg-slate-900 text-white font-semibold shadow-card">Filtruj</button>
             <a href="{{ route('companies.index') }}" class="px-4 py-3 rounded-xl border border-slate-200 text-slate-600">Wyczyść</a>
