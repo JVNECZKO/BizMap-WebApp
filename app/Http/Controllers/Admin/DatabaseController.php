@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class DatabaseController extends Controller
 {
+    protected array $businessIdMap = [];
+
     public function index()
     {
         return view('admin.database.index', [
@@ -194,13 +196,130 @@ class DatabaseController extends Controller
             foreach ($rows as $row) {
                 $payload[] = (array) $row;
             }
-            if (! empty($payload)) {
-                foreach (array_chunk($payload, 200) as $batch) {
-                    $target->table($table)->insert($batch);
+
+            if ($table === 'businesses') {
+                $this->migrateBusinesses($target, $payload, $log);
+            } elseif (in_array($table, ['business_pkd_codes', 'business_raw_payloads'], true)) {
+                $this->migrateBusinessChildren($target, $table, $payload, $log);
+            } elseif ($table === 'pkd_codes') {
+                $this->migratePkdCodes($target, $payload, $log);
+            } else {
+                $this->insertGeneric($target, $table, $payload, $log);
+            }
+        });
+    }
+
+    protected function migrateBusinesses($target, array $rows, array &$log): void
+    {
+        if (empty($rows)) {
+            return;
+        }
+
+        $batch = [];
+        $slugs = [];
+        $oldBySlug = [];
+        foreach ($rows as $row) {
+            $oldId = $row['id'] ?? null;
+            unset($row['id']);
+            $batch[] = $row;
+            if (! empty($row['slug'])) {
+                $slugs[] = $row['slug'];
+                if ($oldId) {
+                    $oldBySlug[$row['slug']] = $oldId;
                 }
             }
-            $this->logStep($log, "✔ {$table}: " . count($payload) . " rekordów przeniesiono.");
-        });
+        }
+
+        if (! empty($batch)) {
+            foreach (array_chunk($batch, 200) as $chunk) {
+                $target->table('businesses')->upsert($chunk, ['slug']);
+            }
+        }
+
+        if (! empty($slugs)) {
+            $existing = $target->table('businesses')->whereIn('slug', $slugs)->get(['id', 'slug']);
+            foreach ($existing as $item) {
+                $this->businessIdMap[$item->slug] = $item->id;
+                if (isset($oldBySlug[$item->slug])) {
+                    $this->businessIdMapOldToNew[$oldBySlug[$item->slug]] = $item->id;
+                }
+            }
+        }
+
+        $this->logStep($log, "✔ businesses: " . count($rows) . " rekordów przeniesiono.");
+    }
+
+    protected function migrateBusinessChildren($target, string $table, array $rows, array &$log): void
+    {
+        if (empty($rows)) {
+            return;
+        }
+
+        $batch = [];
+        foreach ($rows as $row) {
+            unset($row['id']);
+            $bizId = $row['business_id'] ?? null;
+            if ($bizId && isset($this->businessIdMapOldToNew[$bizId])) {
+                $row['business_id'] = $this->businessIdMapOldToNew[$bizId];
+            } else {
+                continue; // brak mapy, pomijamy
+            }
+
+            // jeżeli nadal nie mamy business_id w mapie docelowej, pomijamy wiersz
+            if (! isset($row['business_id']) || ! $row['business_id']) {
+                continue;
+            }
+            unset($row['slug'], $row['business_slug']);
+            $batch[] = $row;
+        }
+
+        if (! empty($batch)) {
+            foreach (array_chunk($batch, 200) as $chunk) {
+                $target->table($table)->insertOrIgnore($chunk);
+            }
+        }
+
+        $this->logStep($log, "✔ {$table}: " . count($batch) . " rekordów przeniesiono.");
+    }
+
+    protected function migratePkdCodes($target, array $rows, array &$log): void
+    {
+        if (empty($rows)) {
+            return;
+        }
+
+        $batch = [];
+        foreach ($rows as $row) {
+            unset($row['id']);
+            $batch[] = $row;
+        }
+
+        foreach (array_chunk($batch, 200) as $chunk) {
+            $target->table('pkd_codes')->upsert($chunk, ['code', 'version']);
+        }
+
+        $this->logStep($log, "✔ pkd_codes: " . count($rows) . " rekordów przeniesiono.");
+    }
+
+    protected function insertGeneric($target, string $table, array $rows, array &$log): void
+    {
+        if (empty($rows)) {
+            return;
+        }
+
+        $batch = [];
+        foreach ($rows as $row) {
+            unset($row['id']);
+            $batch[] = $row;
+        }
+
+        if (! empty($batch)) {
+            foreach (array_chunk($batch, 200) as $chunk) {
+                $target->table($table)->insert($chunk);
+            }
+        }
+
+        $this->logStep($log, "✔ {$table}: " . count($rows) . " rekordów przeniesiono.");
     }
 
     protected function logStep(array &$log, string $message): void
