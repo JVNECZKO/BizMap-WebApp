@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Business;
 use App\Models\PkdCode;
 use App\Models\Setting;
+use App\Models\PkdTaxonomy;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
@@ -19,8 +20,9 @@ class SitemapService
     {
         $companyFiles = File::glob(public_path('sitemap-companies-*.xml')) ?: [];
         $pkdFiles = File::glob(public_path('sitemap-pkd-*.xml')) ?: [];
+        $taxonomyFiles = File::glob(public_path('sitemap-taxonomy-*.xml')) ?: [];
 
-        $files = array_merge($companyFiles, $pkdFiles);
+        $files = array_merge($companyFiles, $pkdFiles, $taxonomyFiles);
         $files = array_map(fn($path) => basename($path), $files);
         $files = array_values(array_unique($files));
         sort($files, SORT_NATURAL);
@@ -34,6 +36,9 @@ class SitemapService
             @File::delete($old);
         }
         foreach (File::glob(public_path('sitemap-pkd-*.xml')) as $old) {
+            @File::delete($old);
+        }
+        foreach (File::glob(public_path('sitemap-taxonomy-*.xml')) as $old) {
             @File::delete($old);
         }
         @File::delete(public_path('sitemap.xml'));
@@ -82,6 +87,17 @@ class SitemapService
             ->values()
             ->toArray();
 
+        $taxonomyItems = PkdTaxonomy::query()
+            ->orderBy('group_slug')
+            ->orderBy('subgroup_slug')
+            ->get(['group_slug', 'subgroup_slug'])
+            ->map(fn($t) => [
+                'group' => $t->group_slug,
+                'subgroup' => $t->subgroup_slug,
+            ])
+            ->values()
+            ->toArray();
+
         $state = [
             'phase' => 'companies',
             'last_id' => 0,
@@ -93,6 +109,10 @@ class SitemapService
                 'regions' => $regionEntries,
                 'code_index' => 0,
                 'region_index' => 0,
+            ],
+            'taxonomy' => [
+                'items' => $taxonomyItems,
+                'index' => 0,
             ],
         ];
 
@@ -198,19 +218,11 @@ class SitemapService
 
                 if ($chunk->isEmpty()) {
                     if (!empty($state['skip_pkd'])) {
-                        $indexXml = $this->renderIndex($state['files']);
-                        File::put(public_path('sitemap.xml'), $indexXml);
-                        Setting::setValue('sitemap.last_generated_at', now()->toDateTimeString());
-                        Cache::forget($this->jobKey);
-
-                        return [
-                            'status' => 'finished',
-                            'files' => $state['files'],
-                            'total_processed' => $state['processed'],
-                        ];
+                        $state['phase'] = 'taxonomy';
+                    } else {
+                        $state['phase'] = 'pkd';
+                        $state['last_id'] = 0;
                     }
-                    $state['phase'] = 'pkd';
-                    $state['last_id'] = 0;
                     continue;
                 }
 
@@ -260,6 +272,29 @@ class SitemapService
             }
 
             if (empty($urls)) {
+                // przechodzimy do taksonomii
+                $state['phase'] = 'taxonomy';
+                continue;
+            }
+
+            $fileName = "sitemap-pkd-{$state['file_index']}.xml";
+            $xml = $this->renderGenericUrlSet($urls);
+            File::put(public_path($fileName), $xml);
+            $lastFile = $fileName;
+
+            $state['files'][] = $fileName;
+            $state['file_index']++;
+            $filesDone++;
+            continue;
+        }
+
+        // faza taxonomy
+        if ($state['phase'] === 'taxonomy') {
+            $items = $state['taxonomy']['items'];
+            $start = $state['taxonomy']['index'];
+            $batch = array_slice($items, $start, $this->urlsPerFile);
+
+            if (empty($batch)) {
                 $indexXml = $this->renderIndex($state['files']);
                 File::put(public_path('sitemap.xml'), $indexXml);
                 Setting::setValue('sitemap.last_generated_at', now()->toDateTimeString());
@@ -272,12 +307,27 @@ class SitemapService
                 ];
             }
 
-            $fileName = "sitemap-pkd-{$state['file_index']}.xml";
+            $urls = [];
+            foreach ($batch as $entry) {
+                $urls[] = [
+                    'loc' => route('taxonomy.group', [$entry['group']]),
+                    'lastmod' => now(),
+                ];
+                if (!empty($entry['subgroup'])) {
+                    $urls[] = [
+                        'loc' => route('taxonomy.subgroup', [$entry['group'], $entry['subgroup']]),
+                        'lastmod' => now(),
+                    ];
+                }
+            }
+
+            $fileName = "sitemap-taxonomy-{$state['file_index']}.xml";
             $xml = $this->renderGenericUrlSet($urls);
             File::put(public_path($fileName), $xml);
             $lastFile = $fileName;
 
             $state['files'][] = $fileName;
+            $state['taxonomy']['index'] += count($batch);
             $state['file_index']++;
             $filesDone++;
         }
