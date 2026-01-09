@@ -177,7 +177,7 @@ runBtn?.addEventListener('click', async () => {
                 break;
             }
             safety++;
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 800));
         }
         if (safety >= 5000) {
             statusText.textContent = 'Przerwano z powodu limitu prób. Sprawdź log.';
