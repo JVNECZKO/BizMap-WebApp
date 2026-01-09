@@ -9,6 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         \App\Console\Commands\DatabaseTransferDirect::class,
+        \App\Console\Commands\ImportPkdTaxonomy::class,
     ];
 
     /**
