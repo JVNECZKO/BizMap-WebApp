@@ -37,6 +37,8 @@ Route::get('/kontakt', [\App\Http\Controllers\PageController::class, 'contact'])
 Route::post('/kontakt', [\App\Http\Controllers\ContactFormController::class, 'send'])->name('contact.send');
 Route::get('/polityka-prywatnosci', [\App\Http\Controllers\PageController::class, 'privacy'])->name('privacy');
 Route::get('/branze', [\App\Http\Controllers\TaxonomyController::class, 'index'])->name('taxonomy.public');
+Route::get('/branze/{group}', [\App\Http\Controllers\TaxonomyController::class, 'group'])->name('taxonomy.group');
+Route::get('/branze/{group}/{subgroup}', [\App\Http\Controllers\TaxonomyController::class, 'subgroup'])->name('taxonomy.subgroup');
 
 Route::get('/login', [AdminAuthController::class, 'showLogin'])->middleware('guest')->name('login');
 Route::post('/login', [AdminAuthController::class, 'login'])->middleware('guest')->name('login.submit');
