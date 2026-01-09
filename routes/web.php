@@ -93,4 +93,7 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::post('/baza/update', [AdminDatabaseController::class, 'update'])->name('database.update');
     Route::post('/baza/test', [AdminDatabaseController::class, 'test'])->name('database.test');
     Route::post('/baza/migrate', [AdminDatabaseController::class, 'migrate'])->name('database.migrate');
+    Route::post('/baza/migration/save', [AdminDatabaseController::class, 'migrationSave'])->name('database.migration.save');
+    Route::post('/baza/migration/clear', [AdminDatabaseController::class, 'migrationClear'])->name('database.migration.clear');
+    Route::post('/baza/migration/run', [AdminDatabaseController::class, 'migrationRun'])->name('database.migration.run');
 });

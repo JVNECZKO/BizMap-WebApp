@@ -20,6 +20,14 @@ class DatabaseController extends Controller
             'database' => Setting::get('db.database', database_path('database.sqlite')),
             'username' => Setting::get('db.username', 'root'),
             'password' => Setting::get('db.password', ''),
+            'target' => Setting::get('migration.target', [
+                'driver' => 'mysql',
+                'host' => '127.0.0.1',
+                'port' => '3306',
+                'database' => '',
+                'username' => '',
+                'password' => '',
+            ]),
         ]);
     }
 
@@ -93,6 +101,105 @@ class DatabaseController extends Controller
         }
 
         return back()->with('status', 'Schema bazy danych została zaktualizowana.');
+    }
+
+    public function migrationSave(Request $request)
+    {
+        $data = $request->validate([
+            'driver' => 'required|in:mysql',
+            'host' => 'required|string|max:255',
+            'port' => 'nullable|string|max:10',
+            'database' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
+            'password' => 'nullable|string|max:255',
+        ]);
+
+        Setting::setValue('migration.target', $data, 'json');
+
+        return back()->with('status', 'Konfiguracja docelowej bazy zapisana.');
+    }
+
+    public function migrationClear()
+    {
+        Setting::setValue('migration.target', null, 'json');
+
+        return back()->with('status', 'Usunięto konfigurację migracji.');
+    }
+
+    public function migrationRun()
+    {
+        $target = Setting::get('migration.target');
+        if (! is_array($target) || empty($target['database'])) {
+            return response()->json(['error' => 'Brak zapisanej konfiguracji bazy docelowej.'], 422);
+        }
+
+        $config = $this->buildConnectionConfig($target);
+        Config::set('database.connections.migration', $config);
+
+        $log = [];
+        $this->logStep($log, 'Łączenie z bazą docelową...');
+
+        try {
+            DB::purge('migration');
+            DB::connection('migration')->getPdo();
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Połączenie z bazą docelową nie działa: ' . $e->getMessage()], 500);
+        }
+
+        try {
+            $this->logStep($log, 'Uruchamiam migracje schematu na bazie docelowej...');
+            Artisan::call('migrate', ['--database' => 'migration', '--force' => true]);
+            $this->logStep($log, trim(Artisan::output()));
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Migracja schematu nie powiodła się: ' . $e->getMessage(), 'log' => $log], 500);
+        }
+
+        $tables = [
+            'businesses' => 'id',
+            'business_pkd_codes' => 'id',
+            'business_raw_payloads' => 'id',
+            'pkd_codes' => 'id',
+            'pkd_popularity' => 'pkd_code',
+            'import_logs' => 'id',
+            'import_mappings' => 'id',
+            'settings' => 'id',
+        ];
+
+        foreach ($tables as $table => $orderBy) {
+            $this->copyTable($table, $orderBy, $log);
+        }
+
+        $this->logStep($log, 'Migracja danych zakończona. Możesz teraz bezpiecznie przełączyć bazę danych.');
+
+        return response()->json(['ok' => true, 'log' => $log, 'message' => 'Możesz teraz bezpiecznie przełączyć bazę danych.']);
+    }
+
+    protected function copyTable(string $table, string $orderBy, array &$log): void
+    {
+        $source = DB::connection(); // aktualna (sqlite)
+        $target = DB::connection('migration');
+        $chunk = 500;
+
+        $total = $source->table($table)->count();
+        $this->logStep($log, "Kopiuję tabelę {$table} ({$total} rekordów)...");
+
+        $source->table($table)->orderBy($orderBy)->chunk($chunk, function ($rows) use ($target, $table, &$log) {
+            $payload = [];
+            foreach ($rows as $row) {
+                $payload[] = (array) $row;
+            }
+            if (! empty($payload)) {
+                foreach (array_chunk($payload, 200) as $batch) {
+                    $target->table($table)->insert($batch);
+                }
+            }
+            $this->logStep($log, "✔ {$table}: " . count($payload) . " rekordów przeniesiono.");
+        });
+    }
+
+    protected function logStep(array &$log, string $message): void
+    {
+        $log[] = '[' . now()->format('H:i:s') . '] ' . $message;
     }
 
     protected function buildConnectionConfig(array $data): array
