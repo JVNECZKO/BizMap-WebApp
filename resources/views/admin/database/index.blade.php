@@ -109,9 +109,22 @@ async function post(url, body = {}) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-        throw new Error(data.error || 'Błąd żądania');
+        throw new Error(data.error || ('HTTP ' + res.status));
     }
     return data;
+}
+
+async function postWithRetry(url, body = {}, attempts = 5, baseDelay = 2000) {
+    for (let i = 1; i <= attempts; i++) {
+        try {
+            return await post(url, body);
+        } catch (e) {
+            if (i === attempts) throw e;
+            const wait = baseDelay * i;
+            statusText.textContent = `${e.message || 'Błąd'} (próba ${i}/${attempts}), czekam ${wait/1000}s...`;
+            await new Promise(r => setTimeout(r, wait));
+        }
+    }
 }
 
 saveBtn?.addEventListener('click', async () => {
@@ -140,13 +153,21 @@ runBtn?.addEventListener('click', async () => {
     try {
         statusText.textContent = 'Start migracji...';
         logBox.textContent = 'Start...';
-        let resp = await post('{{ route('admin.database.migration.start') }}');
-        logBox.textContent = (resp.log || []).join("\n");
+        let resp = await postWithRetry('{{ route('admin.database.migration.start') }}', {}, 5, 2000);
+        if (resp.log) {
+            logBox.textContent = (resp.log || []).join("\n");
+        }
         statusText.textContent = 'Migracja krokowa trwa...';
 
         let keepGoing = true;
-        while (keepGoing) {
-            resp = await post('{{ route('admin.database.migration.run') }}');
+        let safety = 0;
+        while (keepGoing && safety < 5000) {
+            try {
+                resp = await postWithRetry('{{ route('admin.database.migration.run') }}', {}, 5, 2000);
+            } catch(e) {
+                statusText.textContent = e.message || 'Błąd migracji.';
+                break;
+            }
             if (resp.log) {
                 logBox.textContent = (logBox.textContent + "\n" + resp.log.join("\n")).trim();
             }
@@ -155,7 +176,11 @@ runBtn?.addEventListener('click', async () => {
                 statusText.textContent = resp.message || 'Zakończono.';
                 break;
             }
+            safety++;
             await new Promise(r => setTimeout(r, 300));
+        }
+        if (safety >= 5000) {
+            statusText.textContent = 'Przerwano z powodu limitu prób. Sprawdź log.';
         }
     } catch(e) {
         statusText.textContent = e.message;
