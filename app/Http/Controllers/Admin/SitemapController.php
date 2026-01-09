@@ -30,6 +30,13 @@ class SitemapController extends Controller
         return response()->json(['status' => 'started']);
     }
 
+    public function startPkd(SitemapService $sitemapService)
+    {
+        $sitemapService->startPkdOnly();
+
+        return response()->json(['status' => 'started']);
+    }
+
     public function run(SitemapService $sitemapService)
     {
         $steps = (int) request()->input('steps', 10);
@@ -45,5 +52,12 @@ class SitemapController extends Controller
         $sitemapService->clearAll();
 
         return response()->json(['status' => 'cleared']);
+    }
+
+    public function reindex(SitemapService $sitemapService)
+    {
+        $result = $sitemapService->rebuildIndexOnly();
+
+        return response()->json($result);
     }
 }

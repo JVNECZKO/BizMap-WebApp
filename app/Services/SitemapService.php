@@ -22,6 +22,7 @@ class SitemapService
 
         $files = array_merge($companyFiles, $pkdFiles);
         $files = array_map(fn($path) => basename($path), $files);
+        $files = array_values(array_unique($files));
         sort($files, SORT_NATURAL);
 
         return $files;
@@ -39,6 +40,23 @@ class SitemapService
 
         Cache::forget($this->jobKey);
         Setting::setValue('sitemap.last_generated_at', null);
+    }
+
+    public function rebuildIndexOnly(): array
+    {
+        $files = $this->listFiles();
+        if (empty($files)) {
+            return ['status' => 'empty'];
+        }
+
+        $indexXml = $this->renderIndex($files);
+        File::put(public_path('sitemap.xml'), $indexXml);
+        Setting::setValue('sitemap.last_generated_at', now()->toDateTimeString());
+
+        return [
+            'status' => 'rebuilt',
+            'files' => $files,
+        ];
     }
 
     public function start(): void
@@ -70,6 +88,53 @@ class SitemapService
             'file_index' => 1,
             'files' => [],
             'processed' => 0,
+            'pkd' => [
+                'codes' => $pkdCodes,
+                'regions' => $regionEntries,
+                'code_index' => 0,
+                'region_index' => 0,
+            ],
+        ];
+
+        Cache::forever($this->jobKey, $state);
+    }
+
+    public function startPkdOnly(): void
+    {
+        foreach (File::glob(public_path('sitemap-pkd-*.xml')) as $old) {
+            @File::delete($old);
+        }
+        @File::delete(public_path('sitemap.xml'));
+
+        $pkdVersion = Setting::get('pkd.version', '2007');
+        $pkdCodes = PkdCode::query()
+            ->where('version', $pkdVersion)
+            ->where('is_leaf', true)
+            ->orderBy('code')
+            ->get(['code', 'name'])
+            ->map(fn($item) => [
+                'code' => $item->code,
+                'slug' => Str::slug($item->code . ' ' . $item->name),
+            ])
+            ->values()
+            ->toArray();
+
+        $regions = app(\App\Services\FilterService::class)->get()['wojewodztwa'] ?? [];
+        $regionEntries = collect($regions)
+            ->map(fn($w) => ['name' => $w, 'slug' => Str::slug($w)])
+            ->values()
+            ->toArray();
+
+        $existingCompanyFiles = File::glob(public_path('sitemap-companies-*.xml')) ?: [];
+        $existingCompanyFiles = array_map(fn($p) => basename($p), $existingCompanyFiles);
+
+        $state = [
+            'phase' => 'pkd',
+            'last_id' => 0,
+            'file_index' => 1,
+            'files' => array_values(array_unique($existingCompanyFiles)),
+            'processed' => 0,
+            'skip_pkd' => false,
             'pkd' => [
                 'codes' => $pkdCodes,
                 'regions' => $regionEntries,

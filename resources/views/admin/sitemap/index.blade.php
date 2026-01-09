@@ -14,6 +14,8 @@
     <div class="space-y-3">
         <button id="start-sitemap" class="px-5 py-3 rounded-xl bg-slate-900 text-white shadow-panel">Generuj sitemapę (pełne)</button>
         <button id="update-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Aktualizuj sitemapę (tylko nowe firmy)</button>
+        <button id="pkd-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Generuj tylko PKD</button>
+        <button id="reindex-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Przebuduj tylko sitemap.xml (index)</button>
         <button id="clear-sitemap" class="px-5 py-3 rounded-xl bg-white text-slate-800 border border-slate-200">Usuń wszystkie sitemap</button>
         <div id="sitemap-status" class="text-sm text-slate-600">Oczekiwanie...</div>
     </div>
@@ -35,6 +37,8 @@
     const statusEl = document.getElementById('sitemap-status');
     const btn = document.getElementById('start-sitemap');
     const btnUpdate = document.getElementById('update-sitemap');
+    const btnPkd = document.getElementById('pkd-sitemap');
+    const btnReindex = document.getElementById('reindex-sitemap');
     let running = false;
     let stepsPerCall = 5;
 
@@ -75,6 +79,36 @@
             credentials:'same-origin'
         });
         runChunk();
+    });
+
+    btnPkd.addEventListener('click', async () => {
+        if (running) return;
+        running = true;
+        statusEl.innerText = 'Start generowania wyłącznie PKD...';
+        await fetch('{{ route('admin.sitemap.pkd') }}', {
+            method:'POST',
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            credentials:'same-origin'
+        });
+        runChunk();
+    });
+
+    btnReindex.addEventListener('click', async () => {
+        if (running) return;
+        statusEl.innerText = 'Przebudowuję index sitemap.xml...';
+        const res = await fetch('{{ route('admin.sitemap.reindex') }}', {
+            method:'POST',
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            credentials:'same-origin'
+        });
+        const data = await res.json().catch(()=>({}));
+        if (res.ok && data.status === 'rebuilt') {
+            statusEl.innerText = `Index przebudowany. Plików uwzględnionych: ${data.files?.length ?? 0}.`;
+        } else if (data.status === 'empty') {
+            statusEl.innerText = 'Brak plików sitemap do indeksu.';
+        } else {
+            statusEl.innerText = 'Błąd przy przebudowie indexu.';
+        }
     });
 
     async function runChunk() {
