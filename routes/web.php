@@ -98,4 +98,10 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::match(['post','get'],'/baza/migration/start', [AdminDatabaseController::class, 'migrationStart'])->name('database.migration.start');
     Route::match(['post','get'],'/baza/migration/run', [AdminDatabaseController::class, 'migrationRun'])->name('database.migration.run');
     Route::match(['post','get'],'/baza/migration/direct', [AdminDatabaseController::class, 'migrationDirect'])->name('database.migration.direct');
+    // aliasy bez słowa "migration" (na wypadek WAF)
+    Route::match(['post','get'],'/baza/transfer/save', [AdminDatabaseController::class, 'migrationSave'])->name('database.transfer.save');
+    Route::match(['post','get'],'/baza/transfer/clear', [AdminDatabaseController::class, 'migrationClear'])->name('database.transfer.clear');
+    Route::match(['post','get'],'/baza/transfer/start', [AdminDatabaseController::class, 'migrationStart'])->name('database.transfer.start');
+    Route::match(['post','get'],'/baza/transfer/run', [AdminDatabaseController::class, 'migrationRun'])->name('database.transfer.run');
+    Route::match(['post','get'],'/baza/transfer/direct', [AdminDatabaseController::class, 'migrationDirect'])->name('database.transfer.direct');
 });

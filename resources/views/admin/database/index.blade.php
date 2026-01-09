@@ -163,7 +163,16 @@ runBtn?.addEventListener('click', async () => {
     try {
         statusText.textContent = 'Start migracji...';
         logBox.textContent = 'Start...';
-        let resp = await postWithRetry('{{ route('admin.database.migration.start') }}', {}, 5, 2000);
+        let startUrl = '{{ route('admin.database.migration.start') }}';
+        let runUrl = '{{ route('admin.database.migration.run') }}';
+        let resp;
+        try {
+            resp = await postWithRetry(startUrl, {}, 5, 2000);
+        } catch(e1) {
+            startUrl = '{{ route('admin.database.transfer.start') }}';
+            runUrl = '{{ route('admin.database.transfer.run') }}';
+            resp = await postWithRetry(startUrl, {}, 5, 2000);
+        }
         if (resp.log) {
             logBox.textContent = (resp.log || []).join("\n");
         }
@@ -173,7 +182,7 @@ runBtn?.addEventListener('click', async () => {
         let safety = 0;
         while (keepGoing && safety < 5000) {
             try {
-                resp = await postWithRetry('{{ route('admin.database.migration.run') }}', {}, 5, 2000);
+                resp = await postWithRetry(runUrl, {}, 5, 2000);
             } catch(e) {
                 statusText.textContent = e.message || 'Błąd migracji.';
                 break;
@@ -201,7 +210,14 @@ directBtn?.addEventListener('click', async () => {
     try {
         statusText.textContent = 'Migracja bezpośrednia...';
         logBox.textContent = 'Start...';
-        const resp = await postWithRetry('{{ route('admin.database.migration.direct') }}', {}, 3, 4000);
+        let url = '{{ route('admin.database.migration.direct') }}';
+        let resp;
+        try {
+            resp = await postWithRetry(url, {}, 3, 4000);
+        } catch(e1) {
+            url = '{{ route('admin.database.transfer.direct') }}';
+            resp = await postWithRetry(url, {}, 3, 4000);
+        }
         if (resp.log) {
             logBox.textContent = (resp.log || []).join("\n");
         }
