@@ -14,6 +14,7 @@ class DatabaseController extends Controller
 {
     protected array $businessIdMap = [];
     protected array $businessIdMapOldToNew = [];
+    protected int $directChunk = 50000;
 
     public function index()
     {
@@ -442,5 +443,81 @@ class DatabaseController extends Controller
                 \PDO::ATTR_PERSISTENT => true,
             ],
         ];
+    }
+
+    /**
+     * Tryb bezpośredni – cała migracja w jednym wywołaniu (duże paczki, bez stanu).
+     */
+    public function migrationDirect()
+    {
+        @set_time_limit(0);
+        $target = Setting::get('migration.target');
+        if (! is_array($target) || empty($target['database'])) {
+            return response()->json(['error' => 'Brak zapisanej konfiguracji bazy docelowej.'], 422);
+        }
+
+        $config = $this->buildConnectionConfig($target);
+        Config::set('database.connections.migration', $config);
+
+        $log = [];
+        $this->logStep($log, 'Tryb bezpośredni: łączenie z bazą docelową...');
+
+        try {
+            DB::purge('migration');
+            DB::connection('migration')->getPdo();
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Połączenie z bazą docelową nie działa: ' . $e->getMessage()], 500);
+        }
+
+        try {
+            $this->logStep($log, 'Uruchamiam migracje schematu na bazie docelowej...');
+            Artisan::call('migrate', ['--database' => 'migration', '--force' => true]);
+            $this->logStep($log, trim(Artisan::output()));
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Migracja schematu nie powiodła się: ' . $e->getMessage(), 'log' => $log], 500);
+        }
+
+        $targetConn = DB::connection('migration');
+        $this->ensureMigrationMapTable($targetConn, true);
+
+        foreach ($this->migrationTables() as $table) {
+            $name = $table['name'];
+            $orderBy = $table['order'];
+            $this->logStep($log, "→ Kopiuję {$name} (chunk {$this->directChunk})...");
+
+            $offset = 0;
+            while (true) {
+                $rows = DB::connection()->table($name)
+                    ->orderBy($orderBy)
+                    ->offset($offset)
+                    ->limit($this->directChunk)
+                    ->get()
+                    ->map(fn($r) => (array) $r)
+                    ->all();
+
+                if (empty($rows)) {
+                    break;
+                }
+
+                if ($name === 'businesses') {
+                    $this->migrateBusinesses($targetConn, $rows, $log);
+                } elseif (in_array($name, ['business_pkd_codes', 'business_raw_payloads'], true)) {
+                    $this->migrateBusinessChildren($targetConn, $name, $rows, $log);
+                } elseif ($name === 'pkd_codes') {
+                    $this->migratePkdCodes($targetConn, $rows, $log);
+                } else {
+                    $this->insertGeneric($targetConn, $name, $rows, $log);
+                }
+
+                $offset += count($rows);
+                $this->logStep($log, "✔ {$name}: przeniesiono kolejnych " . count($rows) . " (offset {$offset})");
+            }
+
+            $this->logStep($log, "✔ {$name}: ukończono.");
+        }
+
+        $this->logStep($log, 'Migracja bezpośrednia zakończona. Możesz teraz bezpiecznie przełączyć bazę danych.');
+
+        return response()->json(['ok' => true, 'log' => $log, 'message' => 'Możesz teraz bezpiecznie przełączyć bazę danych.', 'status' => 'finished']);
     }
 }

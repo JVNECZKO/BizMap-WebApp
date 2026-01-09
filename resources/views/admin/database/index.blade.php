@@ -82,6 +82,7 @@
             <button type="button" id="migration-save" class="px-4 py-3 rounded-xl bg-slate-900 text-white text-sm">Zapisz bazę docelową</button>
             <button type="button" id="migration-clear" class="px-4 py-3 rounded-xl border border-slate-200 text-sm">Usuń konfigurację</button>
             <button type="button" id="migration-run" class="px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm">Utwórz schemat i migruj dane</button>
+            <button type="button" id="migration-direct" class="px-4 py-3 rounded-xl bg-indigo-600 text-white text-sm">Migracja bezpośrednia (1 klik)</button>
             <span id="migration-status" class="text-sm text-slate-600"></span>
         </div>
     </form>
@@ -97,6 +98,7 @@
 const saveBtn = document.getElementById('migration-save');
 const clearBtn = document.getElementById('migration-clear');
 const runBtn = document.getElementById('migration-run');
+const directBtn = document.getElementById('migration-direct');
 const logBox = document.getElementById('migration-log');
 const statusText = document.getElementById('migration-status');
 
@@ -192,6 +194,20 @@ runBtn?.addEventListener('click', async () => {
         }
     } catch(e) {
         statusText.textContent = e.message;
+    }
+});
+
+directBtn?.addEventListener('click', async () => {
+    try {
+        statusText.textContent = 'Migracja bezpośrednia...';
+        logBox.textContent = 'Start...';
+        const resp = await postWithRetry('{{ route('admin.database.migration.direct') }}', {}, 3, 4000);
+        if (resp.log) {
+            logBox.textContent = (resp.log || []).join("\n");
+        }
+        statusText.textContent = resp.message || 'Zakończono.';
+    } catch(e) {
+        statusText.textContent = e.message || 'Błąd migracji.';
     }
 });
 </script>

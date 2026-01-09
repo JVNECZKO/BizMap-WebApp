@@ -97,4 +97,5 @@ Route::prefix(config('bizmap.admin_prefix'))->middleware(['auth', 'admin'])->nam
     Route::match(['post','get'],'/baza/migration/clear', [AdminDatabaseController::class, 'migrationClear'])->name('database.migration.clear');
     Route::match(['post','get'],'/baza/migration/start', [AdminDatabaseController::class, 'migrationStart'])->name('database.migration.start');
     Route::match(['post','get'],'/baza/migration/run', [AdminDatabaseController::class, 'migrationRun'])->name('database.migration.run');
+    Route::match(['post','get'],'/baza/migration/direct', [AdminDatabaseController::class, 'migrationDirect'])->name('database.migration.direct');
 });
