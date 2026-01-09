@@ -14,10 +14,13 @@ class SeoController extends Controller
     public function pkdLanding(string $code, string $slug, ?string $region = null)
     {
         $pkdVersion = Setting::get('pkd.version', '2007');
-        $pkd = PkdCode::query()
+        $pkdCodesList = PkdCode::query()
             ->where('version', $pkdVersion)
-            ->where('code', $code)
-            ->first();
+            ->where('is_leaf', true)
+            ->orderBy('code')
+            ->get(['code', 'name']);
+
+        $pkd = $pkdCodesList->firstWhere('code', $code);
 
         if (! $pkd) {
             abort(404);
@@ -64,13 +67,9 @@ class SeoController extends Controller
             ->map(fn($w) => ['name' => $w, 'slug' => Str::slug($w)])
             ->take(12);
 
-        $relatedCodes = PkdCode::query()
-            ->where('version', $pkdVersion)
-            ->where('is_leaf', true)
+        $relatedCodes = $pkdCodesList
             ->where('code', '!=', $pkd->code)
-            ->orderBy('code')
-            ->limit(10)
-            ->get()
+            ->take(10)
             ->map(function ($item) {
                 return [
                     'code' => $item->code,
@@ -78,6 +77,14 @@ class SeoController extends Controller
                     'slug' => Str::slug($item->code . ' ' . $item->name),
                 ];
             });
+
+        $allCodes = $pkdCodesList->map(function ($item) {
+            return [
+                'code' => $item->code,
+                'name' => $item->name,
+                'slug' => Str::slug($item->code . ' ' . $item->name),
+            ];
+        })->values();
 
         $metaTitle = "Firmy PKD {$pkd->code} – {$pkd->name}" . ($regionName ? ' w ' . $regionName : '');
         $metaDescription = "Przegląd firm o kodzie PKD {$pkd->code} ({$pkd->name})" . ($regionName ? " działających w regionie {$regionName}." : '.');
@@ -89,6 +96,7 @@ class SeoController extends Controller
             'companies' => $companies,
             'otherRegions' => $otherRegions,
             'relatedCodes' => $relatedCodes,
+            'allCodes' => $allCodes,
             'metaTitle' => $metaTitle,
             'metaDescription' => $metaDescription,
         ]);

@@ -10,6 +10,21 @@
         <p class="text-slate-600 mb-4">
             Zestawienie firm przypisanych do kodu PKD {{ $pkd->code }} ({{ $pkd->name }}). @if($regionName) Lista zawężona do województwa {{ $regionName }}.@else Możesz przejrzeć działalności w całym kraju lub zawęzić widok do wybranego regionu.@endif
         </p>
+        <div class="flex flex-wrap gap-4 items-center mb-4">
+            <div>
+                <label class="text-xs uppercase tracking-[0.2em] text-slate-500 block mb-1">Wybierz kod PKD</label>
+                <select id="pkd-select" class="rounded-xl border border-slate-200 px-4 py-2 text-sm min-w-[260px]">
+                    @foreach($allCodes as $item)
+                        <option value="{{ $item['code'] }}" data-slug="{{ $item['slug'] }}" @selected($item['code'] === $pkd->code)>
+                            {{ $item['code'] }} — {{ $item['name'] }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            @if($regionName)
+                <div class="text-sm text-slate-600">Region: <span class="font-semibold">{{ $regionName }}</span></div>
+            @endif
+        </div>
         <div class="flex flex-wrap gap-3">
             @foreach($otherRegions as $item)
                 <a href="{{ route('seo.pkd', ['code' => $pkd->code, 'slug' => \Illuminate\Support\Str::slug($pkd->code.' '.$pkd->name), 'region' => $item['slug']]) }}"
@@ -80,4 +95,25 @@
         </div>
     </div>
 </div>
+</div>
+
+@push('scripts')
+<script>
+    (() => {
+        const select = document.getElementById('pkd-select');
+        const currentRegion = @json($regionSlug);
+
+        select?.addEventListener('change', () => {
+            const option = select.options[select.selectedIndex];
+            const code = option.value;
+            const slug = option.dataset.slug;
+            let url = `/pkd/${encodeURIComponent(code)}/${slug}`;
+            if (currentRegion) {
+                url += `/${currentRegion}`;
+            }
+            window.location.href = url;
+        });
+    })();
+</script>
+@endpush
 @endsection
