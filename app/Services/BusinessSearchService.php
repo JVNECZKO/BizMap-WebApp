@@ -112,6 +112,10 @@ class BusinessSearchService
                 'imported_at',
             ])
             ->filter($filters)
+            ->when($filters['q'] ?? null, function ($q, $term) {
+                // jeśli MySQL z MATCH dostępny, użyjemy fulltext; fallback na like w scopeFilter
+                $q->when($this->supportsFulltext(), fn($qq) => $qq->searchFullText($term));
+            })
             ->recent();
     }
 
@@ -123,5 +127,11 @@ class BusinessSearchService
     protected function ttl(): int
     {
         return (int) config('bizmap.cache.ttl', 900);
+    }
+
+    protected function supportsFulltext(): bool
+    {
+        // zakładamy MySQL/MariaDB; w SQLite MATCH nie zadziała
+        return config('database.default') !== 'sqlite';
     }
 }

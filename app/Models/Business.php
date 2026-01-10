@@ -48,6 +48,15 @@ class Business extends Model
         'imported_at' => 'datetime',
     ];
 
+    public function scopeSearchFullText($query, string $term)
+    {
+        $clean = preg_replace('/[+\\-><()~*\"@]/', ' ', $term);
+        $parts = array_filter(explode(' ', $clean));
+        $boolean = implode(' ', array_map(fn($p) => '+' . $p . '*', $parts));
+
+        return $query->whereRaw("MATCH(full_name, nip, regon, imie, nazwisko) AGAINST(? IN BOOLEAN MODE)", [$boolean]);
+    }
+
     protected static function booted(): void
     {
         static::creating(function (Business $business): void {
